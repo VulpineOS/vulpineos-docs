@@ -1,0 +1,62 @@
+# Event Translation
+
+Foxbridge subscribes to Juggler events and translates them to CDP events that Puppeteer and other clients expect.
+
+## Navigation Events
+
+| Juggler Event | CDP Events Emitted |
+|---|---|
+| `Page.navigationCommitted` | `Page.lifecycleEvent(init)` → `Page.lifecycleEvent(commit)` → `Page.frameNavigated` |
+| `Page.eventFired(load)` | `Page.loadEventFired` → `Page.lifecycleEvent(load)` → `Page.frameStoppedLoading` |
+| `Page.eventFired(DOMContentLoaded)` | `Page.domContentEventFired` → `Page.lifecycleEvent(DOMContentLoaded)` |
+
+Events are emitted in Chrome's exact ordering — Puppeteer relies on this for `page.waitForNavigation()`.
+
+## Target Events
+
+| Juggler Event | CDP Events |
+|---|---|
+| `Browser.attachedToTarget` | `Target.attachedToTarget` (tab) → `Target.attachedToTarget` (page, deferred) |
+| `Browser.detachedFromTarget` | `Target.targetDestroyed` (page) → `Target.targetDestroyed` (tab) |
+
+Foxbridge uses a **dual session model**: each Juggler page target gets two CDP sessions — a "tab" session and a "page" session. This matches Chrome's internal protocol structure that Puppeteer expects. The page attachment is deferred until `setAutoAttach` is called on the tab session.
+
+## Execution Context Events
+
+| Juggler Event | CDP Event |
+|---|---|
+| `Runtime.executionContextCreated` | `Runtime.executionContextCreated` (numeric ID allocated) |
+| `Runtime.executionContextDestroyed` | `Runtime.executionContextDestroyed` (reverse lookup + cleanup) |
+| `Runtime.executionContextsCleared` | `Runtime.executionContextsCleared` |
+
+CDP uses numeric context IDs; Juggler uses strings. Foxbridge maintains a bidirectional map (`ctxMap`) that allocates monotonically increasing numeric IDs and maps them to Juggler string IDs.
+
+## Console Events
+
+| Juggler Event | CDP Event |
+|---|---|
+| `Runtime.console` | `Runtime.consoleAPICalled` |
+
+## Dialog Events
+
+| Juggler Event | CDP Event |
+|---|---|
+| `Page.dialogOpened` | `Page.javascriptDialogOpening` |
+| `Page.dialogClosed` | `Page.javascriptDialogClosed` |
+
+## Network Events
+
+| Juggler Event | CDP Event |
+|---|---|
+| `Network.requestWillBeSent` | `Network.requestWillBeSent` |
+| `Network.responseReceived` | `Network.responseReceived` |
+| `Network.requestFinished` | `Network.loadingFinished` |
+| `Network.requestFailed` | `Network.loadingFailed` |
+| `Browser.requestIntercepted` | `Fetch.requestPaused` |
+
+## Frame Events
+
+| Juggler Event | CDP Event |
+|---|---|
+| `Page.frameAttached` | `Page.frameAttached` (stores main frame ID) |
+| `Page.frameDetached` | `Page.frameDetached` |

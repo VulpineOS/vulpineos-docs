@@ -1,0 +1,49 @@
+# Foxbridge CDP Proxy
+
+Foxbridge translates Chrome DevTools Protocol (CDP) into Firefox's Juggler and WebDriver BiDi protocols. Any tool built for Chrome — Puppeteer, OpenClaw, browser-use — can control Firefox-based browsers like Camoufox without modification.
+
+**Repository:** [PopcornDev1/foxbridge](https://github.com/PopcornDev1/foxbridge)
+
+## Why Foxbridge?
+
+AI agent tools like OpenClaw speak CDP natively. Firefox uses Juggler, a completely different protocol. Without foxbridge, agents can't use Camoufox's anti-detect stealth — they're stuck with Chrome, which is trivially detectable by anti-bot systems.
+
+Foxbridge eliminates this gap: it presents a CDP WebSocket that looks exactly like Chrome to the client, but every command is translated and routed through Camoufox.
+
+## Architecture
+
+```
+CDP Client (Puppeteer, OpenClaw, etc.)
+  │
+  ▼ WebSocket (ws://localhost:9222)
+┌────────────────────────────────────┐
+│ foxbridge                          │
+│  CDP Server + HTTP Discovery       │
+│  Bridge Layer (method translation) │
+│  ├── Juggler Backend (pipe FD 3/4) │
+│  └── BiDi Backend (WebSocket)      │
+└────────────────────────────────────┘
+  │
+  ▼
+Firefox / Camoufox
+```
+
+## Key Features
+
+- **Full Puppeteer compatibility** — ~100% CDP method coverage across 12 domains
+- **Dual backend** — Juggler (production) and WebDriver BiDi (W3C standard)
+- **Request interception** — Fetch domain with continue/fulfill/fail
+- **Tab→page dual session model** — matches Chrome's internal protocol structure
+- **Numeric↔string context ID translation** — CDP uses numbers, Juggler uses strings
+- **awaitPromise support** — async expressions wrapped in IIFEs transparently
+- **VulpineOS integration** — launches automatically alongside the kernel
+
+## VulpineOS Integration
+
+When foxbridge is installed, VulpineOS launches it on startup and configures OpenClaw to route browser traffic through Camoufox:
+
+```
+OpenClaw agent → CDP → foxbridge:9222 → Juggler pipe → Camoufox
+```
+
+If foxbridge isn't available, OpenClaw falls back to its built-in Chrome.

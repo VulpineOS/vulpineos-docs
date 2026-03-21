@@ -1,0 +1,116 @@
+# CDP Domain Coverage
+
+Foxbridge translates the following CDP domains to Firefox's Juggler protocol.
+
+## Full Coverage
+
+### Target Domain
+
+| Method | Description |
+|--------|-------------|
+| `Target.setAutoAttach` | Auto-attach to new targets (tab→page dual model) |
+| `Target.createTarget` | Create new page via `Browser.newPage` |
+| `Target.closeTarget` | Close page via `Page.close` |
+| `Target.createBrowserContext` | Isolated browser context |
+| `Target.disposeBrowserContext` | Remove context |
+| `Target.getTargets` | List all targets (pages + workers) |
+| `Target.attachToTarget` | Attach to existing target |
+| `Target.activateTarget` | Focus tab |
+| `Target.getBrowserContexts` | List unique context IDs |
+| `Target.getTargetInfo` | Get target metadata |
+| `Target.setDiscoverTargets` | Emit targetCreated for existing targets |
+
+### Page Domain
+
+| Method | Juggler Equivalent |
+|--------|--------------------|
+| `Page.navigate` | `Page.navigate` (frameId resolved from session) |
+| `Page.reload` | `Page.reload` |
+| `Page.close` | `Page.close` |
+| `Page.captureScreenshot` | `Page.screenshot` (format, clip, fullPage) |
+| `Page.printToPDF` | `Page.printToPDF` (landscape, margins, scale) |
+| `Page.getFrameTree` | Built from session state + AX tree probe |
+| `Page.getLayoutMetrics` | `Runtime.evaluate` (viewport dimensions) |
+| `Page.setContent` | `Runtime.evaluate` (document.write) |
+| `Page.handleJavaScriptDialog` | `Page.handleDialog` |
+| `Page.addScriptToEvaluateOnNewDocument` | `Page.addScriptToEvaluateOnNewDocument` |
+| `Page.removeScriptToEvaluateOnNewDocument` | `Page.removeScriptToEvaluateOnNewDocument` |
+| `Page.createIsolatedWorld` | Context ID allocation + event emission |
+| `Page.setExtraHTTPHeaders` | `Browser.setExtraHTTPHeaders` |
+
+### Runtime Domain
+
+| Method | Notes |
+|--------|-------|
+| `Runtime.evaluate` | Context ID mapping + `awaitPromise` wrapping |
+| `Runtime.callFunctionOn` | `objectId` pass-through + `awaitPromise` wrapping |
+| `Runtime.releaseObject` | `Runtime.disposeObject` |
+| `Runtime.getProperties` | `Runtime.getObjectProperties` |
+| `Runtime.addBinding` | Stub |
+| `Runtime.discardConsoleEntries` | Stub |
+
+### Input Domain
+
+| Method | Juggler Equivalent |
+|--------|--------------------|
+| `Input.dispatchMouseEvent` | `Page.dispatchMouseEvent` (incl. wheel deltaX/Y) |
+| `Input.dispatchKeyEvent` | `Page.dispatchKeyEvent` |
+| `Input.insertText` | `Page.insertText` |
+| `Input.dispatchTouchEvent` | `Page.dispatchTouchEvent` |
+
+### Network Domain
+
+| Method | Juggler Equivalent |
+|--------|--------------------|
+| `Network.setCookies` | `Browser.setCookies` |
+| `Network.getCookies` | `Browser.getCookies` |
+| `Network.clearBrowserCookies` | `Browser.clearCookies` |
+| `Network.setExtraHTTPHeaders` | `Browser.setExtraHTTPHeaders` |
+| `Network.setRequestInterception` | `Browser.setRequestInterception` |
+| `Network.getResponseBody` | `Browser.getResponseBody` |
+| `Network.emulateNetworkConditions` | Stub (no Juggler equivalent) |
+
+### Fetch Domain
+
+| Method | Juggler Equivalent |
+|--------|--------------------|
+| `Fetch.enable` | `Browser.setRequestInterception({enabled: true})` |
+| `Fetch.disable` | `Browser.setRequestInterception({enabled: false})` |
+| `Fetch.continueRequest` | `Browser.continueInterceptedRequest` |
+| `Fetch.fulfillRequest` | `Browser.fulfillInterceptedRequest` |
+| `Fetch.failRequest` | `Browser.abortInterceptedRequest` |
+| `Fetch.getResponseBody` | `Browser.getResponseBody` |
+
+### DOM Domain
+
+| Method | Implementation |
+|--------|----------------|
+| `DOM.getDocument` | `Runtime.evaluate` for document info |
+| `DOM.querySelector` | `Runtime.evaluate` with selector |
+| `DOM.querySelectorAll` | `Runtime.evaluate` for count |
+| `DOM.describeNode` | `Runtime.callFunction` on objectId |
+| `DOM.resolveNode` | Returns stub remote object |
+| `DOM.getBoxModel` | `Runtime.callFunction` (getBoundingClientRect) |
+| `DOM.getContentQuads` | `Runtime.callFunction` (getBoundingClientRect) |
+| `DOM.getOuterHTML` | `Runtime.callFunction` (outerHTML) |
+| `DOM.scrollIntoViewIfNeeded` | `Runtime.callFunction` |
+| `DOM.focus` | `Runtime.callFunction` |
+| `DOM.setFileInputFiles` | `Page.setFileInputFiles` |
+
+### Emulation Domain
+
+| Method | Juggler Equivalent |
+|--------|--------------------|
+| `Emulation.setGeolocationOverride` | `Browser.setGeolocationOverride` |
+| `Emulation.setUserAgentOverride` | `Browser.setUserAgentOverride` |
+| `Emulation.setTimezoneOverride` | `Browser.setTimezoneOverride` |
+| `Emulation.setLocaleOverride` | `Browser.setLocaleOverride` |
+| `Emulation.setDeviceMetricsOverride` | `Browser.setDefaultViewport` |
+| `Emulation.setTouchEmulationEnabled` | `Browser.setTouchOverride` |
+| `Emulation.setEmulatedMedia` | `Page.setEmulatedMedia` |
+
+## Stub Domains (No-op)
+
+These return empty success responses. They're Chrome-specific features with no Firefox equivalent:
+
+Debugger, Profiler, Performance, HeapProfiler, Memory, ServiceWorker, CacheStorage, IndexedDB, Log, Security, CSS, Overlay, DOMStorage, WebAuthn, Media, Audits, Inspector, Database, BackgroundService, Cast, DeviceAccess

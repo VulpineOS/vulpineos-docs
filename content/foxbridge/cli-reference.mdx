@@ -1,0 +1,77 @@
+# CLI Reference
+
+## Flags
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--port` | `9222` | CDP WebSocket server port |
+| `--binary` | auto-detect | Path to Firefox or Camoufox binary |
+| `--headless` | `false` | Run browser in headless mode |
+| `--profile` | — | Firefox profile directory |
+| `--backend` | `juggler` | Backend protocol: `juggler` or `bidi` |
+| `--bidi-url` | — | Connect to an existing BiDi WebSocket endpoint instead of launching Firefox |
+| `--bidi-port` | `9223` | Port for BiDi WebSocket when auto-launching Firefox with `--backend bidi` |
+
+## Examples
+
+### Basic usage with Camoufox
+
+```bash
+foxbridge --binary ~/.camoufox/camoufox --port 9222
+```
+
+### Headless mode
+
+```bash
+foxbridge --binary /path/to/camoufox --headless --port 9222
+```
+
+### BiDi backend with auto-launch
+
+```bash
+foxbridge --backend bidi --binary /usr/bin/firefox --port 9222
+```
+
+Firefox is launched with `--remote-debugging-port` and foxbridge connects to the BiDi WebSocket automatically.
+
+### BiDi backend connecting to existing browser
+
+```bash
+foxbridge --backend bidi --bidi-url ws://localhost:9223/session --port 9222
+```
+
+### Custom profile directory
+
+```bash
+foxbridge --binary /path/to/camoufox --profile /tmp/foxbridge-profile --port 9222
+```
+
+## HTTP Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /json/version` | Browser version info + WebSocket URL |
+| `GET /json/list` | Active page targets with WebSocket URLs |
+| `GET /json` | Alias for `/json/list` |
+| `WS /devtools/browser/` | Main CDP WebSocket connection |
+| `WS /` | Convenience alias for WebSocket |
+
+## Binary Detection
+
+If `--binary` is not specified, foxbridge searches for Firefox/Camoufox in this order:
+
+1. `./camoufox` or `./firefox` (current directory)
+2. `~/.camoufox/camoufox`
+3. System PATH (`which firefox` / `which camoufox`)
+
+## Testing
+
+```bash
+# Run all tests with race detector
+go test -race ./...
+
+# Build only
+go build ./...
+```
+
+CI runs automatically via GitHub Actions on every push to `main`.

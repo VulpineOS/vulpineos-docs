@@ -1,0 +1,74 @@
+# Quick Start
+
+## Install
+
+```bash
+go install github.com/PopcornDev1/foxbridge/cmd/foxbridge@latest
+```
+
+Or build from source:
+
+```bash
+git clone https://github.com/PopcornDev1/foxbridge.git
+cd foxbridge
+go build -o foxbridge ./cmd/foxbridge/
+```
+
+## Run with Juggler (Default)
+
+```bash
+foxbridge --binary /path/to/camoufox --port 9222
+```
+
+Foxbridge launches Camoufox, connects via Juggler pipe, and starts a CDP WebSocket server on port 9222.
+
+## Run with BiDi
+
+```bash
+# Auto-launch Firefox with BiDi
+foxbridge --backend bidi --binary /path/to/firefox --port 9222
+
+# Connect to an existing BiDi endpoint
+foxbridge --backend bidi --bidi-url ws://localhost:9223/session --port 9222
+```
+
+## Connect Puppeteer
+
+```js
+const puppeteer = require('puppeteer');
+
+const browser = await puppeteer.connect({
+  browserWSEndpoint: 'ws://localhost:9222'
+});
+
+const page = await browser.newPage();
+await page.goto('https://example.com');
+console.log(await page.title());
+await page.screenshot({ path: 'screenshot.png' });
+await browser.close();
+```
+
+## Connect OpenClaw
+
+In your OpenClaw config (`~/.openclaw-vulpine/openclaw.json`):
+
+```json
+{
+  "browser": {
+    "enabled": true,
+    "cdpUrl": "ws://localhost:9222"
+  }
+}
+```
+
+VulpineOS sets this automatically when foxbridge is available.
+
+## HTTP Discovery
+
+```bash
+# Browser info
+curl http://localhost:9222/json/version
+
+# Active page targets
+curl http://localhost:9222/json/list
+```

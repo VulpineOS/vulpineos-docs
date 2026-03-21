@@ -1,0 +1,82 @@
+# WebDriver BiDi Backend
+
+Foxbridge supports WebDriver BiDi as an alternative backend to Juggler. BiDi is the W3C standard cross-browser automation protocol — it's the future, and Firefox is the most complete implementation.
+
+## Why BiDi?
+
+- **W3C standard** — not a proprietary protocol like Juggler or CDP
+- **Cross-browser** — same protocol for Firefox, Chrome, Safari (eventually)
+- **Future-proof** — Playwright is expected to deprecate Juggler in favor of BiDi (~2027)
+- **Built into Firefox** — no custom patches required
+
+## How It Works
+
+The BiDi client implements the same `Backend` interface as the Juggler client. It translates Juggler-style method calls to BiDi equivalents internally, so the bridge layer works unchanged:
+
+```
+CDP Client → Bridge (speaks Juggler methods) → BiDi Client → BiDi WebSocket → Firefox
+```
+
+The BiDi client handles:
+
+| Juggler Method | BiDi Equivalent |
+|---|---|
+| `Browser.newPage` | `browsingContext.create({type:"tab"})` |
+| `Browser.close` | `browser.close` |
+| `Page.navigate` | `browsingContext.navigate({context, url, wait:"complete"})` |
+| `Page.reload` | `browsingContext.reload({context})` |
+| `Page.screenshot` | `browsingContext.captureScreenshot({context})` |
+| `Page.printToPDF` | `browsingContext.print({context})` |
+| `Page.handleDialog` | `browsingContext.handleUserPrompt({context})` |
+| `Runtime.evaluate` | `script.evaluate({expression, target:{context}})` |
+| `Runtime.callFunction` | `script.callFunction({functionDeclaration, target:{context}})` |
+| `Runtime.disposeObject` | `script.disown({handles})` |
+| `Page.dispatchMouseEvent` | `input.performActions({actions:[pointer]})` |
+| `Page.dispatchKeyEvent` | `input.performActions({actions:[key]})` |
+
+## Event Translation (BiDi → Juggler)
+
+| BiDi Event | Juggler Event |
+|---|---|
+| `browsingContext.contextCreated` | `Browser.attachedToTarget` |
+| `browsingContext.contextDestroyed` | `Browser.detachedFromTarget` |
+| `browsingContext.load` | `Page.eventFired(load)` |
+| `browsingContext.domContentLoaded` | `Page.eventFired(DOMContentLoaded)` |
+| `browsingContext.navigationStarted` | `Page.navigationCommitted` |
+| `browsingContext.userPromptOpened` | `Page.dialogOpened` |
+| `script.realmCreated` | `Runtime.executionContextCreated` |
+| `script.realmDestroyed` | `Runtime.executionContextDestroyed` |
+| `script.message` | `Runtime.console` |
+| `network.beforeRequestSent` | `Network.requestWillBeSent` |
+| `network.responseCompleted` | `Network.requestFinished` |
+
+## Usage
+
+```bash
+# Auto-launch Firefox with BiDi
+foxbridge --backend bidi --binary /path/to/firefox
+
+# Connect to an existing BiDi WebSocket
+foxbridge --backend bidi --bidi-url ws://localhost:9223/session
+
+# Custom BiDi port
+foxbridge --backend bidi --binary /path/to/firefox --bidi-port 9225
+```
+
+## Key Differences from Juggler
+
+| | Juggler | BiDi |
+|---|---|---|
+| **Transport** | Pipe FD 3/4 (null-byte JSON) | WebSocket (standard JSON) |
+| **Session model** | sessionId in every message | context embedded in params |
+| **Execution contexts** | String IDs | Realm IDs (string UUIDs) |
+| **Events** | Always streaming | Explicit subscription required |
+| **Input** | Imperative events | W3C Actions API (action chains) |
+| **Maturity** | Battle-tested (Playwright) | Maturing (W3C spec) |
+
+## State Tracking
+
+The BiDi client maintains:
+- **contextMap**: Juggler session ID → BiDi browsing context ID
+- **realmMap**: BiDi realm ID → browsing context ID (for session resolution)
+- **subscriptions**: auto-subscribe to all relevant events on `Browser.enable`
