@@ -1,11 +1,11 @@
-import { Footer, Layout, Navbar } from 'nextra-theme-docs'
+import { Layout, Navbar } from 'nextra-theme-docs'
 import { Head } from 'nextra/components'
 import { getPageMap } from 'nextra/page-map'
 import 'nextra-theme-docs/style.css'
 
 export const metadata = {
   title: 'VulpineOS — Agent Security Runtime',
-  description: 'The first browser engine with AI agent security built into the C++ core. Built on Camoufox (Firefox 146.0.1).',
+  description: 'The first browser engine with AI agent security built into the C++ core.',
 }
 
 const logo = (
@@ -22,12 +22,6 @@ const navbar = (
   />
 )
 
-const footer = (
-  <Footer>
-    <span>VulpineOS — Built on <a href="https://github.com/AtomoTech/camoufox" style={{ textDecoration: 'underline' }}>Camoufox</a></span>
-  </Footer>
-)
-
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
@@ -40,7 +34,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           navbar={navbar}
           pageMap={await getPageMap()}
           docsRepositoryBase="https://github.com/PopcornDev1/vulpineos-docs/tree/main/content"
-          footer={footer}
+          footer={<></>}
           sidebar={{ defaultMenuCollapseLevel: 1 }}
         >
           {children}
