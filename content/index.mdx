@@ -2,7 +2,7 @@
 
 **The first browser engine with AI agent security built into the C++ core.**
 
-VulpineOS is a hardened Firefox fork (based on [Camoufox](https://github.com/AtomoTech/camoufox) / Firefox 146.0.1) purpose-built for autonomous AI agents. It solves the three critical problems that make current browser-based agents fragile and exploitable.
+VulpineOS is a hardened Firefox fork (based on [Camoufox](https://github.com/daijro/camoufox) / Firefox 146.0.1) purpose-built for autonomous AI agents. It solves the three critical problems that make current browser-based agents fragile and exploitable.
 
 ## The Problem
 
@@ -60,6 +60,14 @@ VulpineOS ships as a single Go binary (`vulpineos`) that manages the Firefox ker
 └─────────────────────────────────────────┘
 ```
 
+## Foxbridge — CDP Proxy
+
+[Foxbridge](/foxbridge) is a companion project that translates Chrome DevTools Protocol (CDP) to Firefox's Juggler and WebDriver BiDi protocols. It lets any CDP tool — Puppeteer, OpenClaw, browser-use — control Camoufox as if it were Chrome.
+
+When foxbridge is installed, VulpineOS launches it automatically and routes OpenClaw's browser tools through Camoufox instead of Chrome.
+
+[Learn more →](/foxbridge)
+
 ## Credits
 
-VulpineOS is built on [Camoufox](https://github.com/AtomoTech/camoufox), originally created by [daijro](https://github.com/daijro) and maintained by [Clover Labs](https://github.com/CloverLabsAI). The anti-detection fingerprinting, mouse trajectory algorithms, and Juggler automation layer all originate from that project.
+VulpineOS is built on [Camoufox](https://github.com/daijro/camoufox), originally created by [daijro](https://github.com/daijro) and maintained by [Clover Labs](https://github.com/CloverLabsAI). The anti-detection fingerprinting, mouse trajectory algorithms, and Juggler automation layer all originate from that project.
