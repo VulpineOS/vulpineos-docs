@@ -10,7 +10,7 @@ export const metadata = {
 
 const logo = (
   <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 800, fontSize: '1.1rem' }}>
-    <span>🦊</span>
+    <img src="/VulpineOSCircleLogo.png" alt="VulpineOS" width={28} height={28} style={{ borderRadius: '50%' }} />
     <span>VulpineOS</span>
   </span>
 )
@@ -27,7 +27,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head>
         <meta name="theme-color" content="#7C3AED" />
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦊</text></svg>" />
+        <link rel="icon" href="/VulpineOSCircleLogo.png" />
       </Head>
       <body>
         <Layout
