@@ -1,0 +1,138 @@
+# Cost Tracking
+
+Per-agent token usage tracking with USD cost estimation, budget limits, and alert webhooks. Know exactly what each agent costs and stop runaway spending before it happens.
+
+## Per-Agent Token Usage
+
+Every LLM call made by an agent is tracked with input tokens, output tokens, and the model used:
+
+```json
+{
+  "method": "Agent.getCostReport",
+  "params": { "agentId": "agent-research" }
+}
+// Response:
+{
+  "agentId": "agent-research",
+  "totalInputTokens": 142850,
+  "totalOutputTokens": 28430,
+  "totalCostUsd": 0.87,
+  "calls": 23,
+  "model": "claude-sonnet-4-20250514",
+  "sessionStart": "2026-03-28T10:00:00Z"
+}
+```
+
+The TUI displays live token counts in the agent detail panel (right column), updating after each LLM call.
+
+## Model Pricing
+
+Built-in pricing for major providers (per million tokens):
+
+| Model | Input | Output |
+|-------|-------|--------|
+| Claude Sonnet 4 | $3.00 | $15.00 |
+| Claude Opus 4 | $15.00 | $75.00 |
+| Claude Haiku 3.5 | $0.80 | $4.00 |
+| GPT-4o | $2.50 | $10.00 |
+| GPT-4o mini | $0.15 | $0.60 |
+| Gemini 2.5 Pro | $1.25 | $10.00 |
+| Gemini 2.5 Flash | $0.15 | $0.60 |
+
+Custom pricing can be set in config:
+
+```json
+{
+  "modelPricing": {
+    "my-custom-model": { "inputPerMillion": 1.00, "outputPerMillion": 5.00 }
+  }
+}
+```
+
+## Budget Limits
+
+Set per-agent or global budget caps. When a limit is reached, the agent is paused automatically.
+
+```json
+{
+  "method": "Agent.setBudget",
+  "params": {
+    "agentId": "agent-research",
+    "maxCostUsd": 5.00,
+    "action": "pause"
+  }
+}
+```
+
+Global budgets apply across all agents:
+
+```json
+{
+  "method": "Budget.setGlobal",
+  "params": { "maxCostUsd": 50.00, "resetInterval": "daily" }
+}
+```
+
+The `resetInterval` can be `hourly`, `daily`, `weekly`, or `none` (lifetime cap).
+
+## Alert Thresholds
+
+Get notified before hitting budget limits:
+
+```json
+{
+  "method": "Budget.setAlerts",
+  "params": {
+    "thresholds": [
+      { "percent": 50, "action": "notify" },
+      { "percent": 80, "action": "notify" },
+      { "percent": 100, "action": "pause" }
+    ]
+  }
+}
+```
+
+Alerts appear in the TUI as amber notifications. At 100%, the agent pauses and waits for operator approval to continue.
+
+## Webhook Integration
+
+Forward budget events to external systems for monitoring, Slack alerts, or billing:
+
+```json
+{
+  "method": "Budget.setWebhook",
+  "params": {
+    "url": "https://your-server.com/webhooks/vulpineos",
+    "events": ["threshold_reached", "budget_exceeded", "agent_paused"],
+    "secret": "whsec_abc123"
+  }
+}
+```
+
+Webhook payloads are signed with HMAC-SHA256 using the shared secret:
+
+```json
+{
+  "event": "threshold_reached",
+  "agentId": "agent-research",
+  "threshold": 80,
+  "currentCostUsd": 4.02,
+  "budgetUsd": 5.00,
+  "timestamp": "2026-03-28T14:30:00Z"
+}
+```
+
+Verify the signature via the `X-Vulpine-Signature` header.
+
+## TUI Cost View
+
+The agent detail panel shows a live cost breakdown:
+
+```
+agent-research        ● ACTIVE
+Tokens: 142.8K in / 28.4K out
+Cost:   $0.87 / $5.00 budget  [████████░░] 17%
+Model:  claude-sonnet-4-20250514
+```
+
+Press `$` in the TUI to toggle the global cost summary overlay, showing total spend across all agents for the current session.

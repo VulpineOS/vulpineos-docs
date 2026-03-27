@@ -1,0 +1,115 @@
+# Agent-to-Agent Communication Bus
+
+A structured message-passing system that allows agents to collaborate on tasks, delegate subtasks, and share findings — all under a strict security policy.
+
+## Message Types
+
+The bus supports four message types, each with different semantics:
+
+| Type | Direction | Description |
+|------|-----------|-------------|
+| `ask` | A &rarr; B | Request information, B must reply |
+| `delegate` | A &rarr; B | Assign a subtask, B reports completion |
+| `reply` | B &rarr; A | Response to an `ask` or `delegate` |
+| `notify` | A &rarr; all | Broadcast an event (no reply expected) |
+
+## Sending Messages
+
+Agents send messages through the orchestrator's message bus:
+
+```json
+{
+  "method": "Agent.sendMessage",
+  "params": {
+    "from": "agent-research",
+    "to": "agent-writer",
+    "type": "delegate",
+    "payload": {
+      "task": "Write a summary of the findings",
+      "data": { "urls": ["https://example.com/report"], "keyPoints": ["..."] }
+    },
+    "timeout": 30000
+  }
+}
+```
+
+Replies are delivered asynchronously via the agent's conversation channel:
+
+```json
+{
+  "type": "reply",
+  "from": "agent-writer",
+  "inReplyTo": "msg-a1b2c3",
+  "payload": { "summary": "The report indicates..." }
+}
+```
+
+## Policy System
+
+All inter-agent communication is **default deny**. You must explicitly allow message paths.
+
+### Per-Pair Policies
+
+```json
+{
+  "agentPolicies": [
+    { "from": "agent-research", "to": "agent-writer", "allow": ["delegate", "notify"] },
+    { "from": "agent-writer", "to": "agent-research", "allow": ["ask"] },
+    { "from": "agent-qa", "to": "*", "allow": ["ask"] }
+  ]
+}
+```
+
+### Wildcard Policies
+
+The `*` wildcard matches any agent. Use it for monitoring agents that need read access to all communication:
+
+```json
+{ "from": "agent-supervisor", "to": "*", "allow": ["ask", "notify"] }
+```
+
+### Policy Evaluation Order
+
+1. Check per-pair policies (most specific)
+2. Check wildcard policies
+3. Default deny — message is blocked and logged
+
+## Approval Queue
+
+For sensitive operations, policies can require human approval:
+
+```json
+{ "from": "agent-purchase", "to": "agent-payment", "allow": ["delegate"], "requireApproval": true }
+```
+
+When `requireApproval` is set, the message is held in a queue. The TUI displays pending approvals, and the operator can approve or reject each one. Rejected messages return an error to the sender.
+
+In the TUI, pending approvals appear as notifications. Press `m` to open the message queue, then `a` to approve or `d` to deny.
+
+## Audit Trail
+
+Every message is logged to the vault database with:
+
+- Timestamp
+- Sender and recipient agent IDs
+- Message type and payload hash
+- Policy evaluation result (allowed/denied/pending)
+- Approval decision (if applicable)
+
+Query the audit trail:
+
+```json
+{ "method": "Agent.getMessageLog", "params": { "agentId": "agent-research", "limit": 50 } }
+```
+
+## Security Model
+
+The bus enforces several security invariants:
+
+- **No direct connections** — agents cannot open channels to each other; all messages route through the orchestrator
+- **Payload size limits** — messages over 100KB are rejected to prevent context flooding
+- **Rate limiting** — max 10 messages per second per agent to prevent bus saturation
+- **No self-messaging** — agents cannot send messages to themselves
+- **Timeout enforcement** — unanswered `ask` and `delegate` messages expire and return errors
+
+These constraints prevent a compromised agent from disrupting other agents through the communication channel.

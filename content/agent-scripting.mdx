@@ -1,0 +1,93 @@
+# Agent Scripting DSL
+
+A JSON-based scripting language for repetitive browser tasks that runs without consuming any LLM tokens. Define sequences of actions once, then replay them across pages, agents, or schedules.
+
+## Why Scripts?
+
+Agents burn tokens on tasks that don't require reasoning — logging into a site, navigating to a specific page, filling a known form. The scripting DSL handles these deterministic sequences natively in the kernel, reserving LLM calls for decisions that actually need intelligence.
+
+## Script Format
+
+A script is a JSON array of action objects:
+
+```json
+[
+  { "action": "navigate", "url": "https://example.com/login" },
+  { "action": "type", "selector": "#email", "text": "user@example.com" },
+  { "action": "type", "selector": "#password", "text": "${LOGIN_PASSWORD}" },
+  { "action": "click", "selector": "button[type=submit]" },
+  { "action": "wait", "selector": ".dashboard", "timeout": 5000 },
+  { "action": "screenshot", "name": "post-login" }
+]
+```
+
+## Available Actions
+
+| Action | Parameters | Description |
+|--------|-----------|-------------|
+| `navigate` | `url` | Navigate to a URL |
+| `click` | `selector`, `button?` | Click an element (left/right/middle) |
+| `type` | `selector`, `text`, `clear?` | Type text into an input (optionally clear first) |
+| `wait` | `selector?`, `timeout?`, `state?` | Wait for element or fixed delay (ms) |
+| `extract` | `selector`, `attribute?`, `var` | Extract text/attribute into a variable |
+| `screenshot` | `name?`, `fullPage?` | Capture screenshot |
+| `set` | `var`, `value` | Set a variable |
+| `if` | `var`, `equals?`, `contains?`, `then`, `else?` | Conditional branching |
+
+## Variable Expansion
+
+Variables use `${VAR_NAME}` syntax. They can come from environment variables, `set` actions, or `extract` results:
+
+```json
+[
+  { "action": "navigate", "url": "https://example.com/search" },
+  { "action": "type", "selector": "#query", "text": "${SEARCH_TERM}" },
+  { "action": "click", "selector": "#search-btn" },
+  { "action": "wait", "selector": ".results" },
+  { "action": "extract", "selector": ".result-count", "var": "COUNT" },
+  {
+    "action": "if",
+    "var": "COUNT",
+    "equals": "0",
+    "then": [
+      { "action": "screenshot", "name": "no-results" }
+    ],
+    "else": [
+      { "action": "extract", "selector": ".result:first-child a", "attribute": "href", "var": "FIRST_URL" },
+      { "action": "navigate", "url": "${FIRST_URL}" }
+    ]
+  }
+]
+```
+
+## Running Scripts
+
+Scripts can be triggered via the Juggler protocol, MCP tools, or the TUI:
+
+```json
+// Juggler protocol
+{ "method": "Page.runScript", "params": { "script": [...], "variables": { "SEARCH_TERM": "VulpineOS" } } }
+```
+
+```bash
+# CLI
+vulpineos --run-script login.json --var LOGIN_PASSWORD=secret
+```
+
+From the TUI, press `s` on a selected agent to attach a script that runs before the agent's first LLM call.
+
+## Pre-Agent Scripts
+
+The most common use case: run a login script before handing the page to an agent. The agent starts on an authenticated page without spending tokens on login flow.
+
+```json
+{
+  "preScript": "scripts/login-github.json",
+  "variables": { "GH_TOKEN": "${env:GITHUB_TOKEN}" },
+  "task": "Review the latest pull requests on the VulpineOS repo"
+}
+```
+
+## Script Library
+
+Store reusable scripts in `~/.vulpineos/scripts/`. They're available to all agents and can be referenced by filename in agent configs and the TUI.

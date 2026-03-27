@@ -1,0 +1,100 @@
+# Web Panel
+
+A browser-based management interface served from the VulpineOS binary. Access the full dashboard, agent management, and configuration from any browser — no TUI required.
+
+## Starting the Web Panel
+
+The panel is served alongside the remote WebSocket server:
+
+```bash
+vulpineos --serve --port 8443 --api-key $VULPINE_API_KEY --web-panel
+```
+
+Then open `https://your-server:8443/panel` in any browser. Authentication uses the same API key as the WebSocket endpoint.
+
+## Pages
+
+The panel includes 10 pages covering all VulpineOS management tasks:
+
+### Dashboard
+
+Live overview: kernel status, memory and CPU usage, detection risk gauge, active agent count, pool utilization, and recent alerts. Data updates via WebSocket — no polling.
+
+### Agents
+
+Table of all agents with status, task summary, token usage, cost, and assigned proxy. Bulk actions: pause all, resume all, delete completed. Click an agent row to open its detail page.
+
+### Agent Detail
+
+Full agent view: conversation history (scrollable, role-colored), live token counter, assigned citizen profile, proxy configuration, and browser contexts. Send messages to the agent directly from the text input at the bottom.
+
+### Contexts
+
+Grid of active browser contexts showing URL, page title, and memory usage. Click a context to view its live screenshot (refreshes every 2 seconds). Context actions: close, recycle, assign to agent.
+
+### Proxies
+
+Proxy management table: address, protocol, latency, geo (country/city), status (active/failed). Import proxies from a text list. Test button measures latency and resolves exit IP. Geo-sync indicator shows whether the proxy's fingerprint is location-matched.
+
+### Security
+
+Security event timeline: injection attempts (with matched pattern and source text), CSP violations, DOM mutation alerts, and rate limit detections. Filter by severity, agent, or time range. Detection risk score graph over the last 24 hours.
+
+### Webhooks
+
+Webhook configuration: add/edit/remove endpoints, select event types, test delivery, view recent delivery history with response codes. Failed deliveries are highlighted with retry options.
+
+### Scripts
+
+Script library browser: view, edit, and test scripts from `~/.vulpineos/scripts/`. Built-in JSON editor with syntax highlighting. Run button executes the script in a test context. Assign scripts to agents via drag-and-drop.
+
+### Logs
+
+Searchable log viewer: kernel logs, agent stdout, protocol messages, and audit trail. Filter by log level, source, and time range. Tail mode for real-time streaming.
+
+### Settings
+
+Configuration panel: LLM provider and model selection, API key management, context pool settings (pre-warm count, max active, recycle threshold), trust warming toggle, and global budget limits.
+
+## API Endpoints
+
+The panel communicates with VulpineOS through 29 REST endpoints:
+
+| Group | Endpoints | Methods |
+|-------|-----------|---------|
+| Agents | `/api/agents`, `/api/agents/:id`, `/api/agents/:id/messages` | GET, POST, PUT, DELETE |
+| Contexts | `/api/contexts`, `/api/contexts/:id`, `/api/contexts/:id/screenshot` | GET, POST, DELETE |
+| Proxies | `/api/proxies`, `/api/proxies/:id`, `/api/proxies/:id/test` | GET, POST, PUT, DELETE |
+| Security | `/api/security/events`, `/api/security/risk` | GET |
+| Webhooks | `/api/webhooks`, `/api/webhooks/:id`, `/api/webhooks/:id/test` | GET, POST, PUT, DELETE |
+| Scripts | `/api/scripts`, `/api/scripts/:id`, `/api/scripts/:id/run` | GET, POST, PUT, DELETE |
+| Budget | `/api/budget`, `/api/budget/agents/:id` | GET, PUT |
+| System | `/api/status`, `/api/logs`, `/api/config` | GET, PUT |
+| Auth | `/api/auth/verify` | POST |
+
+All endpoints require `Authorization: Bearer <api-key>`. Responses are JSON.
+
+## WebSocket Communication
+
+The panel opens a WebSocket connection to `/ws` for real-time updates. Events are the same ones exposed through the Juggler protocol:
+
+```js
+const ws = new WebSocket('wss://server:8443/ws?token=API_KEY')
+ws.onmessage = (event) => {
+  const msg = JSON.parse(event.data)
+  // msg.type: "telemetryUpdate", "injectionAttemptDetected",
+  //           "agentStatusChanged", "trustWarmingStateChanged", etc.
+}
+```
+
+The panel subscribes to all event types and routes them to the appropriate page components.
+
+## Single Binary
+
+The web panel's static assets (HTML, CSS, JS) are embedded in the Go binary using `embed.FS`. No external web server or file serving is needed — the entire panel ships as part of the `vulpineos` binary.
+
+```bash
+# The binary includes everything
+ls -lh vulpineos
+# -rwxr-xr-x  1 user  staff  14M  vulpineos
+```
