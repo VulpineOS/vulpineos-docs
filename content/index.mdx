@@ -43,35 +43,54 @@ make fetch && make setup && make dir && make build
 
 On first launch, the setup wizard walks you through selecting an AI provider and model. See [Getting Started](/getting-started) for full instructions.
 
+## Platform Features
+
+Beyond the browser engine security phases, VulpineOS is a complete agent management platform:
+
+| Feature | Description |
+|---------|-------------|
+| [Web Panel](/web-panel) | Browser-based dashboard with 10 pages — manage agents, proxies, contexts, security, and settings from anywhere |
+| [TUI Workbench](/tui) | Terminal-based 3-column interface for SSH/server environments |
+| [Agent Scripting DSL](/agent-scripting) | JSON scripting for repetitive browser tasks — zero LLM tokens |
+| [Token Optimization](/token-optimization) | Viewport pruning, result caching, incremental snapshots, batch execution |
+| [Advanced Security](/security-features) | CSP injection, DOM mutation monitoring, 13 injection signatures, sandboxed JS evaluation |
+| [Cost Tracking](/cost-tracking) | Per-agent token usage, USD cost estimation, budget limits with alerts |
+| [Agent Communication](/agent-communication) | Agent-to-agent message bus with approval policies and audit trail |
+| [Foxbridge CDP Proxy](/foxbridge) | Embedded CDP server — OpenClaw controls Camoufox as if it were Chrome |
+| [MCP Browser Tools](/mcp-tools) | 12 browser tools for navigate, snapshot, click, type, screenshot, scroll |
+| [Remote Access](/remote) | TLS WebSocket server for headless VPS deployment |
+| [Docker](/docker) | One-click container with Vulpine-Box |
+| Per-Agent Fingerprints | BrowserForge pipeline — unique UA, screen, WebGL, canvas/audio seeds per agent |
+| Context Pool | Pre-warm 10 contexts, max 20 concurrent, auto-recycle after 50 uses |
+| Proxy Rotation | Per-agent rotation on rate limit/block, auto-sync fingerprint geo |
+| Session Recording | Record and replay browser action timelines |
+| Persistent Page Cache | Save/restore page state across agent restarts |
+| Webhook Notifications | HTTP webhooks for agent completion, rate limits, injection, budget events |
+| Kernel Watchdog | Auto-restart Camoufox on crash (up to 3 attempts) |
+
 ## Architecture
 
-VulpineOS ships as a single Go binary (`vulpineos`) that manages the Firefox kernel, a context pool for 100+ concurrent agents, an identity vault, and OpenClaw agent orchestration — all communicating over the Juggler protocol via pipe FD 3/4.
+VulpineOS ships as a single Go binary with 22 packages, an embedded web panel, and an embedded foxbridge CDP server — all sharing a single Camoufox instance:
 
 ```
 ┌─────────────────────────────────────────┐
-│  Go TUI (Bubbletea)                     │
-│  ┌──────────┬────────────┬───────────┐  │
-│  │ System   │ Conversation│ Agent     │  │
-│  │ + Agents │            │ Detail    │  │
-│  └──────────┴────────────┴───────────┘  │
+│  Web Panel (React, embedded)            │
+│  TUI Workbench (Bubbletea)              │
 ├─────────────────────────────────────────┤
 │  Orchestrator · Pool · Vault · MCP      │
+│  AgentBus · CostTracker · Webhooks      │
+│  Recording · PageCache · Security       │
+│  TokenOpt · Scripting · ProxyRotation   │
 ├─────────────────────────────────────────┤
+│  Embedded Foxbridge CDP Server (:9222)  │
 │  Juggler Protocol (FD 3/4 pipe)         │
 ├─────────────────────────────────────────┤
 │  Camoufox (Firefox 146.0.1)             │
 │  C++ Patches: Action Lock, AX Filter    │
+│  BrowserForge Fingerprints per Context  │
 └─────────────────────────────────────────┘
 ```
 
-## Foxbridge — CDP Proxy
-
-[Foxbridge](/foxbridge) is a companion project that translates Chrome DevTools Protocol (CDP) to Firefox's Juggler and WebDriver BiDi protocols. It lets any CDP tool — Puppeteer, OpenClaw, browser-use — control Camoufox as if it were Chrome.
-
-When foxbridge is installed, VulpineOS launches it automatically and routes OpenClaw's browser tools through Camoufox instead of Chrome.
-
-[Learn more →](/foxbridge)
-
 ## Credits
 
-VulpineOS is a personal project by Elliot, forked from [Camoufox](https://github.com/daijro/camoufox) — originally created by [daijro](https://github.com/daijro) and now maintained by [Clover Labs](https://cloverlabs.ai) (where Elliot works and contributed per-context fingerprint spoofing to Camoufox). 
+VulpineOS is a personal project by Elliot, forked from [Camoufox](https://github.com/daijro/camoufox) — originally created by [daijro](https://github.com/daijro) and now maintained by [Clover Labs](https://cloverlabs.ai) (where Elliot works and contributed per-context fingerprint spoofing to Camoufox).
