@@ -1,3 +1,8 @@
+---
+title: "Trust Warming — Build Browser History for Bot Detection Evasion"
+description: "VulpineOS background service warms browser profiles on high-authority sites with human-like browsing behavior."
+---
+
 # Autonomous Trust Warming
 
 **Phase 4** — Background service that warms browser profiles on high-authority sites with human-like interactions while the agent is idle, building organic browsing history to defeat bot detection.
@@ -86,3 +91,11 @@ vulpineos.trustwarm.enabled = false   // default
 - `additions/juggler/protocol/Protocol.js` — 5 new `Browser.*` methods + event
 - `additions/juggler/protocol/BrowserHandler.js` — handler wiring
 - `settings/camoufox.cfg` — `vulpineos.trustwarm.enabled` preference
+
+---
+
+## See also
+
+- [Architecture](/architecture) — single-process runtime overview
+- [Advanced Security Features](/security-features) — CSP, DOM monitoring, injection signatures
+- [Getting Started](/getting-started) — install and launch your first agent

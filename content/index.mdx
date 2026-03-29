@@ -1,3 +1,8 @@
+---
+title: "VulpineOS — AI Browser Agent Operating System for OpenClaw at Scale"
+description: "VulpineOS manages hundreds of AI browser agents on Camoufox with per-agent fingerprints, injection protection, action lock, and token optimization."
+---
+
 <div style={{textAlign: 'center', marginBottom: '2rem'}}>
   <img src="/VulpineOSBanner.png" alt="VulpineOS" style={{maxWidth: '100%', borderRadius: '12px'}} />
 </div>
@@ -41,7 +46,7 @@ make fetch && make setup && make dir && make build
 ./vulpineos
 ```
 
-On first launch, the setup wizard walks you through selecting an AI provider and model. See [Getting Started](/getting-started) for full instructions.
+On first launch, the setup wizard walks you through selecting an AI provider and model. Each AI browser agent gets its own fingerprint, proxy, and isolated browser context. See [Getting Started](/getting-started) for full instructions.
 
 ## Platform Features
 
@@ -94,3 +99,13 @@ VulpineOS ships as a single Go binary with 22 packages, an embedded web panel, a
 ## Credits
 
 VulpineOS is a personal project by Elliot, forked from [Camoufox](https://github.com/daijro/camoufox) — originally created by [daijro](https://github.com/daijro) and now maintained by [Clover Labs](https://cloverlabs.ai) (where Elliot works and contributed per-context fingerprint spoofing to Camoufox).
+
+---
+
+## See also
+
+- [Getting Started](/getting-started) — install and launch your first agent
+- [Architecture](/architecture) — single-process runtime overview
+- [Injection-Proof Filter](/injection-filter) — how VulpineOS blocks prompt injection
+- [MCP Browser Tools](/mcp-tools) — 12 tools for AI agent browser control
+- [Foxbridge CDP Proxy](/foxbridge) — embedded CDP server for OpenClaw

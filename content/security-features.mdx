@@ -1,4 +1,9 @@
-# Advanced Security Features
+---
+title: "Advanced Security Suite — CSP, DOM Monitoring, Sandboxed JS"
+description: "VulpineOS security: CSP header injection, DOM mutation monitoring, 13 injection signature patterns, sandboxed JavaScript evaluation."
+---
+
+# Advanced Security Suite
 
 Beyond the core [Injection Filter](/injection-filter), VulpineOS includes additional security layers that protect agents from prompt injection, data exfiltration, and unauthorized page manipulation.
 
@@ -79,3 +84,11 @@ The injection filter and action-lock are controlled via Firefox preferences:
 ```
 
 The advanced security features (CSP, mutation monitoring, injection signatures, sandboxed evaluation) are Go libraries in `internal/security/` that are applied by the orchestrator when agents are spawned. They're enabled by default and configured programmatically.
+
+---
+
+## See also
+
+- [Injection-Proof Filter](/injection-filter) — strip hidden DOM nodes to prevent prompt injection
+- [Action Lock](/action-lock) — freeze pages during AI agent thinking
+- [Token Optimization](/token-optimization) — viewport pruning, caching, incremental snapshots

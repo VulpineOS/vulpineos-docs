@@ -1,3 +1,8 @@
+---
+title: "Foxbridge BiDi Backend — WebDriver BiDi Support for Firefox CDP"
+description: "Foxbridge WebDriver BiDi backend for vanilla Firefox 129+. W3C standard WebSocket transport."
+---
+
 # WebDriver BiDi Backend
 
 Foxbridge supports WebDriver BiDi as an alternative backend to Juggler. BiDi is the W3C standard cross-browser automation protocol — it's the future, and Firefox is the most complete implementation.
@@ -80,3 +85,10 @@ The BiDi client maintains:
 - **contextMap**: Juggler session ID → BiDi browsing context ID
 - **realmMap**: BiDi realm ID → browsing context ID (for session resolution)
 - **subscriptions**: auto-subscribe to all relevant events on `Browser.enable`
+
+---
+
+## See also
+
+- [Foxbridge CDP Coverage](/foxbridge/cdp-coverage) — 13 Chrome DevTools domains
+- [Foxbridge CLI Reference](/foxbridge/cli-reference) — command line options

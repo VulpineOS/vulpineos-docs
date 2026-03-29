@@ -1,6 +1,11 @@
+---
+title: "Web Panel — Browser Dashboard for VulpineOS Agent Management"
+description: "VulpineOS React web panel: 10-page dashboard for managing agents, proxies, contexts, security, scripts, and settings."
+---
+
 # Web Panel
 
-A browser-based management interface embedded in the VulpineOS binary. Access the full dashboard, agent management, and configuration from any browser.
+A browser-based management interface embedded in the VulpineOS binary for monitoring every AI browser agent in your fleet. Access the full dashboard, agent management, and configuration from any browser.
 
 ## Starting the Web Panel
 
@@ -107,6 +112,14 @@ ws.onmessage = (e) => {
 
 Real-time events (telemetry, injection alerts, agent status) are broadcast automatically to all connected clients.
 
-## Single Binary
+### Single Binary
 
 The web panel's static assets (HTML, CSS, JS) are embedded in the Go binary using `//go:embed`. No external web server needed — `vulpineos --serve` starts the kernel, foxbridge CDP proxy, and web panel from a single binary.
+
+---
+
+## See also
+
+- [TUI Workbench](/tui) — terminal dashboard for managing agents
+- [Remote Access](/remote) — deploy VulpineOS on a VPS with WebSocket
+- [Agent-to-Agent Communication](/agent-communication) — message bus with approval policies

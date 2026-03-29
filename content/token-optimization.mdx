@@ -1,4 +1,9 @@
-# Token Optimization
+---
+title: "Token Optimization — Viewport Pruning, Caching, Incremental Snapshots"
+description: "VulpineOS token optimization: viewport-based DOM pruning, result caching, incremental snapshots, and tool call batching for AI agents."
+---
+
+# Token Optimization for AI Agents
 
 VulpineOS reduces the tokens required for an agent to understand a web page from tens of thousands down to a few thousand, cutting cost and latency while improving accuracy.
 
@@ -104,3 +109,11 @@ const context = await browser.newContext({
   }
 })
 ```
+
+---
+
+## See also
+
+- [Token-Optimized DOM Export](/optimized-dom) — compressed array-of-tuples format
+- [Cost Tracking](/cost-tracking) — per-agent token usage and budget limits
+- [MCP Browser Tools](/mcp-tools) — 12 tools for AI agent browser control

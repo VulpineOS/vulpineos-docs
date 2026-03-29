@@ -1,4 +1,9 @@
-# Build from Source
+---
+title: "Building VulpineOS from Source — Firefox Patches and Go Binary"
+description: "Build VulpineOS: fetch Firefox source, apply C++ patches, compile with mach, build the Go binary."
+---
+
+# Building VulpineOS from Source
 
 VulpineOS is a fork of [Camoufox](https://github.com/daijro/camoufox), itself based on Firefox 146.0.1. The build system uses Make targets that orchestrate Firefox's `mach` build tool.
 
@@ -110,3 +115,11 @@ VulpineOS/
 ## Artifact Builds
 
 On macOS with Apple Silicon, Firefox supports artifact builds that download precompiled C++ components and only rebuild JavaScript/resource changes. This reduces build time from 30+ minutes to under 5 minutes. VulpineOS's `make build` uses this automatically when available.
+
+---
+
+## See also
+
+- [Getting Started](/getting-started) — install and launch your first agent
+- [Architecture](/architecture) — single-process runtime overview
+- [Contributing](/contributing) — development guide and code structure

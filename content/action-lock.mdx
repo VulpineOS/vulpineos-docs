@@ -1,6 +1,11 @@
+---
+title: "Action Lock — Freeze Pages During AI Agent Thinking"
+description: "VulpineOS Action Lock freezes JavaScript, timers, animations, and layout during AI agent decision-making. Prevents page mutation between read and act."
+---
+
 # Action Lock (Deterministic Execution)
 
-**Phase 2** — Freezes the page completely while the AI agent is thinking. No JavaScript, no timers, no layout reflows, no animations, no events. The page the agent analyzed is exactly the page it acts on.
+**Phase 2** — Freezes the page completely while the AI browser agent is thinking. No JavaScript, no timers, no layout reflows, no animations, no events. The page the agent analyzed is exactly the page it acts on. This is essential for reliable browser automation — without deterministic execution, agents act on stale state.
 
 ## The Problem
 
@@ -78,3 +83,12 @@ vulpineos.actionlock.enabled = false
 - `additions/juggler/TargetRegistry.js` — `PageTarget.setActionLock()` IPC bridge
 - `additions/juggler/content/main.js` — content-process freeze/thaw logic
 - `settings/camoufox.cfg` — `vulpineos.actionlock.enabled` preference
+
+---
+
+## See also
+
+- [Injection-Proof Filter](/injection-filter) — strip hidden DOM nodes to prevent prompt injection
+- [Token-Optimized DOM Export](/optimized-dom) — compressed snapshots for LLM context
+- [Architecture](/architecture) — single-process runtime overview
+- [MCP Browser Tools](/mcp-tools) — 12 tools for AI agent browser control

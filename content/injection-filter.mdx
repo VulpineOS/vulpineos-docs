@@ -1,6 +1,11 @@
+---
+title: "Injection-Proof Accessibility Filter — Prevent AI Prompt Injection"
+description: "VulpineOS strips hidden DOM nodes (display:none, opacity:0, off-screen, clip-path) from the accessibility tree to prevent prompt injection in AI browser agents."
+---
+
 # Injection-Proof Accessibility Filter
 
-**Phase 1** — Strips non-visible DOM nodes from the accessibility tree before they reach the AI agent, preventing indirect prompt injection attacks.
+**Phase 1** — Strips non-visible DOM nodes from the accessibility tree before they reach the AI browser agent, providing prompt injection protection at the browser engine level. This is the first line of defense for any AI browser agent performing browser automation on untrusted sites.
 
 ## The Attack
 
@@ -65,3 +70,12 @@ vulpineos.injection_filter.enabled = false
 
 - `additions/juggler/content/PageAgent.js` — `isNodeVisuallyHidden()` function + `buildNode()` integration
 - `settings/camoufox.cfg` — `vulpineos.injection_filter.enabled` preference
+
+---
+
+## See also
+
+- [Advanced Security Features](/security-features) — CSP, DOM monitoring, injection signatures
+- [Action Lock](/action-lock) — freeze pages during AI agent thinking
+- [Token-Optimized DOM Export](/optimized-dom) — compressed snapshots for LLM context
+- [MCP Browser Tools](/mcp-tools) — 12 tools for AI agent browser control

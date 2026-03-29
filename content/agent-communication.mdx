@@ -1,4 +1,9 @@
-# Agent-to-Agent Communication Bus
+---
+title: "Agent-to-Agent Communication — Message Bus with Approval Policies"
+description: "VulpineOS agent bus: agents send messages (ask, delegate, notify) to each other with configurable approval policies and audit trail."
+---
+
+# Agent-to-Agent Communication
 
 A structured message-passing system that allows agents to collaborate on tasks, delegate subtasks, and share findings — all under a strict security policy.
 
@@ -113,3 +118,11 @@ The bus enforces several security invariants:
 - **Timeout enforcement** — unanswered `ask` and `delegate` messages expire and return errors
 
 These constraints prevent a compromised agent from disrupting other agents through the communication channel.
+
+---
+
+## See also
+
+- [Agent Scripting DSL](/agent-scripting) — JSON automation without LLM calls
+- [Web Panel](/web-panel) — browser-based dashboard for agent management
+- [Cost Tracking](/cost-tracking) — per-agent token usage and budget limits

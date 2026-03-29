@@ -1,4 +1,9 @@
-# Architecture
+---
+title: "VulpineOS Architecture — Single-Process AI Agent Runtime"
+description: "VulpineOS architecture: Go binary with 22 packages, embedded foxbridge CDP, Camoufox browser engine, orchestrator, vault, and context pool."
+---
+
+# VulpineOS Architecture
 
 VulpineOS is a vertically integrated stack: a hardened Firefox engine at the bottom, a Go orchestration layer in the middle, and a Bubbletea TUI at the top. Everything communicates over the Juggler wire protocol.
 
@@ -72,3 +77,12 @@ VulpineOS supports three modes:
 3. **Client** — TUI connects to a remote kernel (`--remote wss://...`)
 
 The remote relay multiplexes Juggler messages, control commands, and TUI state updates over a single authenticated WebSocket connection.
+
+---
+
+## See also
+
+- [Getting Started](/getting-started) — install and launch your first agent
+- [Foxbridge CDP Proxy](/foxbridge) — embedded CDP server for OpenClaw
+- [MCP Browser Tools](/mcp-tools) — 12 tools for AI agent browser control
+- [Build from Source](/building) — compile VulpineOS from Firefox patches

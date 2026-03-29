@@ -1,6 +1,11 @@
+---
+title: "MCP Browser Tools — 12 Tools for AI Agent Browser Control"
+description: "VulpineOS MCP tools: navigate, snapshot, click, type, screenshot, scroll, new_context, close_context, get_ax_tree, and more for OpenClaw agents."
+---
+
 # MCP Tools
 
-VulpineOS provides a [Model Context Protocol](https://spec.modelcontextprotocol.io/) (MCP) server that exposes browser automation as tool calls. OpenClaw agents use these tools to browse — every action goes through Camoufox.
+VulpineOS provides a [Model Context Protocol](https://spec.modelcontextprotocol.io/) (MCP) server that exposes browser automation as tool calls. Each AI browser agent uses these tools to browse — every action goes through the anti-detect browser engine (Camoufox). OpenClaw agents call these tools directly for all browser automation tasks.
 
 ```bash
 ./vulpineos --mcp-server
@@ -180,3 +185,12 @@ VulpineOS auto-generates `~/.openclaw-vulpine/openclaw.json`. When foxbridge is 
   }
 }
 ```
+
+---
+
+## See also
+
+- [Getting Started](/getting-started) — install and launch your first agent
+- [Token-Optimized DOM Export](/optimized-dom) — compressed snapshots for LLM context
+- [Foxbridge CDP Proxy](/foxbridge) — embedded CDP server for OpenClaw
+- [Agent Scripting DSL](/agent-scripting) — JSON automation without LLM calls

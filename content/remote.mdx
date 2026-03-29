@@ -1,4 +1,9 @@
-# Remote Access
+---
+title: "Remote Access — Deploy VulpineOS on a VPS with WebSocket"
+description: "VulpineOS remote deployment: TLS WebSocket server mode, API key authentication, connect TUI from anywhere."
+---
+
+# Remote Access — Deploy VulpineOS on a VPS
 
 VulpineOS supports running the browser kernel on one machine and the TUI on another. This is the recommended setup for production: run the kernel on a VPS with residential proxies, control it from your laptop.
 
@@ -84,3 +89,12 @@ curl https://your-vps:8443/health
 - `internal/remote/client.go` — WS client implementing `juggler.Transport`
 - `internal/remote/auth.go` — API key authenticator
 - `internal/remote/relay.go` — Envelope types for multiplexing
+
+---
+
+## See also
+
+- [Docker Deployment](/docker) — one-click Vulpine-Box container
+- [TUI Workbench](/tui) — terminal dashboard for managing agents
+- [Web Panel](/web-panel) — browser-based dashboard for agent management
+- [Getting Started](/getting-started) — install and launch your first agent

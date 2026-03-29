@@ -1,3 +1,8 @@
+---
+title: "Foxbridge Event Translation — Juggler to CDP Event Mapping"
+description: "How foxbridge maps Firefox Juggler events to Chrome DevTools Protocol events."
+---
+
 # Event Translation
 
 Foxbridge subscribes to Juggler events and translates them to CDP events that Puppeteer and other clients expect.
@@ -60,3 +65,10 @@ CDP uses numeric context IDs; Juggler uses strings. Foxbridge maintains a bidire
 |---|---|
 | `Page.frameAttached` | `Page.frameAttached` (stores main frame ID) |
 | `Page.frameDetached` | `Page.frameDetached` |
+
+---
+
+## See also
+
+- [Foxbridge CDP Coverage](/foxbridge/cdp-coverage) — 13 Chrome DevTools domains
+- [Foxbridge BiDi Backend](/foxbridge/bidi-backend) — WebDriver BiDi support

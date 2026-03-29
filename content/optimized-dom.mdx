@@ -1,6 +1,11 @@
+---
+title: "Token-Optimized DOM Export — 80% Fewer Tokens for AI Agents"
+description: "VulpineOS compressed DOM snapshots reduce AI agent context window usage by 80%+. Array-of-tuples format with role codes and single-child flattening."
+---
+
 # Token-Optimized DOM Export
 
-**Phase 3** — Compressed semantic JSON snapshot of the page for LLM context windows, achieving over 50% token reduction compared to the standard accessibility tree.
+**Phase 3** — Compressed semantic JSON snapshot of the page for LLM context windows, achieving over 50% token reduction compared to the standard accessibility tree. Every AI browser agent benefits from this — smaller snapshots mean faster decisions, lower cost, and more room in the context window for browser automation instructions.
 
 ## The Problem
 
@@ -78,3 +83,12 @@ vulpineos.dom_export.enabled = true   // default
 - `additions/juggler/protocol/Protocol.js` — `Page.getOptimizedDOM` definition
 - `additions/juggler/protocol/PageHandler.js` — handler routing
 - `settings/camoufox.cfg` — `vulpineos.dom_export.enabled` preference
+
+---
+
+## See also
+
+- [Token Optimization](/token-optimization) — viewport pruning, caching, incremental snapshots
+- [Injection-Proof Filter](/injection-filter) — strip hidden DOM nodes to prevent prompt injection
+- [Action Lock](/action-lock) — freeze pages during AI agent thinking
+- [MCP Browser Tools](/mcp-tools) — 12 tools for AI agent browser control
