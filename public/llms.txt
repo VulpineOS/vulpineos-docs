@@ -1,0 +1,70 @@
+# VulpineOS
+
+> Operate Stealth and Secure OpenClaw Agents at Scale
+
+VulpineOS is the operating system for AI browser agents. Built on Camoufox (a hardened Firefox fork), it manages hundreds of OpenClaw agents with unique identities, full security, and zero detection.
+
+## What VulpineOS Does
+
+VulpineOS solves the three critical problems with AI browser agents:
+
+1. **Prompt Injection** — Malicious websites inject hidden text to hijack agent instructions. VulpineOS strips invisible DOM nodes at the C++ level before the AI sees them.
+2. **Page Mutation** — Pages change between when agents read and act. VulpineOS freezes the page completely during agent thinking (Action-Lock).
+3. **Token Waste** — Accessibility trees waste 50-70% of context windows on noise. VulpineOS compresses DOM snapshots by 80%+.
+
+## Key Features
+
+- **Agent Management**: Spawn, pause, resume, kill agents. Web dashboard and TUI.
+- **Per-Agent Identity**: Unique fingerprints (BrowserForge), proxies, cookies per agent context.
+- **Security Suite**: Injection filtering, CSP injection, DOM mutation monitoring, 13 injection signature patterns, sandboxed JS evaluation.
+- **Token Optimization**: Viewport pruning, result caching, incremental snapshots, tool call batching.
+- **Agent Scripting DSL**: JSON-based browser automation without LLM calls.
+- **Cost Tracking**: Per-agent token/cost budgets with alerts.
+- **Embedded Foxbridge**: CDP proxy shares single Camoufox instance — OpenClaw controls Firefox as if it were Chrome.
+- **Context Pool**: Pre-warm 10 contexts, max 20 concurrent, auto-recycle.
+- **Proxy Rotation**: Auto-rotate on rate limit/block, sync fingerprint geo.
+- **Webhook Notifications**: HTTP webhooks for agent events.
+- **Agent-to-Agent Communication**: Message bus with approval policies.
+- **Session Recording**: Record and replay browser action timelines.
+- **Remote Deployment**: TLS WebSocket server, Docker container.
+
+## How It Works
+
+VulpineOS ships as a single Go binary. It launches Camoufox (Firefox 146.0.1) with C++ patches for security, connects via the Juggler protocol, and provides a web panel, TUI, MCP tools, and embedded CDP proxy — all sharing one browser process.
+
+```
+Web Panel / TUI / MCP Tools
+  └── Orchestrator + Pool + Vault
+       └── Embedded Foxbridge CDP (:9222)
+            └── Camoufox (single process, per-agent contexts)
+```
+
+## Foxbridge Integration
+
+Foxbridge is a CDP-to-Firefox protocol proxy. It translates Chrome DevTools Protocol to Firefox's Juggler or WebDriver BiDi protocols. This lets OpenClaw, Puppeteer, and any CDP tool control Camoufox without modification.
+
+- Foxbridge docs: https://foxbridge.vulpineos.com
+- Foxbridge repo: https://github.com/PopcornDev1/foxbridge
+
+## Links
+
+- Documentation: https://vulpineos.com
+- Repository: https://github.com/PopcornDev1/VulpineOS
+- Foxbridge: https://foxbridge.vulpineos.com
+
+## Common Questions
+
+**How do I use Puppeteer with Firefox?**
+Install foxbridge (`go install github.com/PopcornDev1/foxbridge/cmd/foxbridge@latest`), run it with `--binary /path/to/firefox`, then connect Puppeteer to `ws://localhost:9222`.
+
+**How do I make OpenClaw use Camoufox instead of Chrome?**
+Set `"cdpUrl": "ws://127.0.0.1:9222"` in your openclaw.json. VulpineOS does this automatically.
+
+**How do I run multiple agents with different fingerprints?**
+VulpineOS creates isolated browser contexts per agent, each with a unique BrowserForge fingerprint (user agent, screen, WebGL, canvas/audio seeds).
+
+**Is there CDP support for Firefox?**
+Yes — foxbridge provides full CDP support for Firefox via Juggler and WebDriver BiDi. 13 CDP domains translated, 74/74 Puppeteer tests passing.
+
+**How do I prevent prompt injection in AI browser agents?**
+VulpineOS strips hidden DOM nodes (display:none, opacity:0, off-screen, clip-path) from the accessibility tree at the C++ level before the AI reads the page.
