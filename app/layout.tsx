@@ -4,8 +4,38 @@ import { getPageMap } from 'nextra/page-map'
 import 'nextra-theme-docs/style.css'
 
 export const metadata = {
-  title: 'VulpineOS',
-  description: 'Operate Stealth and Secure OpenClaw Agents at Scale',
+  title: {
+    default: 'VulpineOS — AI Browser Agent Operating System',
+    template: '%s | VulpineOS',
+  },
+  description: 'VulpineOS is the operating system for AI browser agents. Manage hundreds of OpenClaw agents on Camoufox with unique fingerprints, injection protection, and zero detection.',
+  metadataBase: new URL('https://vulpineos.com'),
+  openGraph: {
+    title: 'VulpineOS — AI Browser Agent Operating System',
+    description: 'Operate stealth and secure OpenClaw agents at scale. Built on Camoufox with injection filtering, action lock, and per-agent fingerprints.',
+    url: 'https://vulpineos.com',
+    siteName: 'VulpineOS',
+    images: [
+      {
+        url: '/VulpineOSBanner.png',
+        width: 1200,
+        height: 630,
+        alt: 'VulpineOS — AI Browser Agent Operating System',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'VulpineOS — AI Browser Agent Operating System',
+    description: 'Operate stealth and secure OpenClaw agents at scale on Camoufox.',
+    images: ['/VulpineOSBanner.png'],
+  },
+  alternates: {
+    canonical: 'https://vulpineos.com',
+  },
+  keywords: ['VulpineOS', 'AI browser agent', 'OpenClaw', 'Camoufox', 'browser automation', 'prompt injection', 'anti-detect browser', 'browser fingerprint', 'action lock', 'CDP proxy', 'foxbridge', 'AI agent security', 'stealth browser', 'browser agent operating system'],
 }
 
 const logo = (
@@ -28,6 +58,47 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <Head>
         <meta name="theme-color" content="#7C3AED" />
         <link rel="icon" href="/VulpineOSCircleLogo.png" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'SoftwareApplication',
+              name: 'VulpineOS',
+              description: 'The operating system for AI browser agents — manage hundreds of OpenClaw agents on Camoufox with unique fingerprints, injection protection, and zero detection',
+              url: 'https://vulpineos.com',
+              applicationCategory: 'DeveloperApplication',
+              operatingSystem: 'macOS, Linux',
+              programmingLanguage: ['Go', 'C++', 'JavaScript'],
+              codeRepository: 'https://github.com/PopcornDev1/VulpineOS',
+              author: {
+                '@type': 'Person',
+                name: 'Elliot',
+              },
+              offers: {
+                '@type': 'Offer',
+                price: '0',
+                priceCurrency: 'USD',
+              },
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              name: 'VulpineOS Documentation',
+              url: 'https://vulpineos.com',
+              description: 'Documentation for VulpineOS AI browser agent operating system',
+              publisher: {
+                '@type': 'Person',
+                name: 'Elliot',
+              },
+            }),
+          }}
+        />
       </Head>
       <body>
         <Layout
