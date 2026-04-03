@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 
-const BASE_URL = 'https://vulpineos.com'
+const BASE_URL = 'https://docs.vulpineos.com'
 
 const pages = [
   '', // index

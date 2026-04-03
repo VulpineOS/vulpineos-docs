@@ -8,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
       },
     ],
-    sitemap: 'https://vulpineos.com/sitemap.xml',
+    sitemap: 'https://docs.vulpineos.com/sitemap.xml',
   }
 }

@@ -11,12 +11,12 @@ export const metadata = {
     template: '%s | VulpineOS',
   },
   description: 'VulpineOS is the operating system for AI browser agents. Manage hundreds of OpenClaw agents on Camoufox with unique fingerprints, injection protection, and zero detection.',
-  metadataBase: new URL('https://vulpineos.com'),
+  metadataBase: new URL('https://docs.vulpineos.com'),
   openGraph: {
     title: 'VulpineOS — AI Browser Agent Operating System',
     description: 'Operate stealth and secure OpenClaw agents at scale. Built on Camoufox with injection filtering, action lock, and per-agent fingerprints.',
-    url: 'https://vulpineos.com',
-    siteName: 'VulpineOS',
+    url: 'https://docs.vulpineos.com',
+    siteName: 'VulpineOS Docs',
     images: [
       {
         url: '/VulpineOSBanner.png',
@@ -35,7 +35,7 @@ export const metadata = {
     images: ['/VulpineOSBanner.png'],
   },
   alternates: {
-    canonical: 'https://vulpineos.com',
+    canonical: 'https://docs.vulpineos.com',
   },
   keywords: ['VulpineOS', 'AI browser agent', 'OpenClaw', 'Camoufox', 'browser automation', 'prompt injection', 'anti-detect browser', 'browser fingerprint', 'action lock', 'CDP proxy', 'foxbridge', 'AI agent security', 'stealth browser', 'browser agent operating system'],
 }
@@ -68,7 +68,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               '@type': 'SoftwareApplication',
               name: 'VulpineOS',
               description: 'The operating system for AI browser agents — manage hundreds of OpenClaw agents on Camoufox with unique fingerprints, injection protection, and zero detection',
-              url: 'https://vulpineos.com',
+              url: 'https://docs.vulpineos.com',
               applicationCategory: 'DeveloperApplication',
               operatingSystem: 'macOS, Linux',
               programmingLanguage: ['Go', 'C++', 'JavaScript'],
@@ -92,7 +92,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               '@context': 'https://schema.org',
               '@type': 'WebSite',
               name: 'VulpineOS Documentation',
-              url: 'https://vulpineos.com',
+              url: 'https://docs.vulpineos.com',
               description: 'Documentation for VulpineOS AI browser agent operating system',
               publisher: {
                 '@type': 'Person',

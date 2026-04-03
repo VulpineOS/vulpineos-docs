@@ -48,7 +48,7 @@ Foxbridge is a CDP-to-Firefox protocol proxy. It translates Chrome DevTools Prot
 
 ## Links
 
-- Documentation: https://vulpineos.com
+- Documentation: https://docs.vulpineos.com
 - Repository: https://github.com/PopcornDev1/VulpineOS
 - Foxbridge: https://foxbridge.vulpineos.com
 
