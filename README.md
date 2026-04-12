@@ -19,9 +19,9 @@ npm run dev
 
 ## Content
 
-29 MDX pages covering:
+30 MDX pages covering:
 - 4 browser engine security phases
-- 12 MCP browser tools
+- 36 MCP browser, reliability, realism, and extension tools
 - Web panel, TUI, remote access, Docker
 - Token optimization, agent scripting, cost tracking
 - Foxbridge CDP proxy integration

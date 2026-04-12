@@ -54,7 +54,7 @@ Beyond the browser engine security phases, VulpineOS is a complete agent managem
 
 | Feature | Description |
 |---------|-------------|
-| [Web Panel](/web-panel) | Browser-based dashboard with 10 pages — manage agents, proxies, contexts, security, and settings from anywhere |
+| [Web Panel](/web-panel) | Browser-based dashboard with 11 pages — manage agents, proxies, contexts, security, scripts, logs, and settings from anywhere |
 | [TUI Workbench](/tui) | Terminal-based 3-column interface for SSH/server environments |
 | [Agent Scripting DSL](/agent-scripting) | JSON scripting for repetitive browser tasks — zero LLM tokens |
 | [Token Optimization](/token-optimization) | Viewport pruning, result caching, incremental snapshots, batch execution |
@@ -62,7 +62,8 @@ Beyond the browser engine security phases, VulpineOS is a complete agent managem
 | [Cost Tracking](/cost-tracking) | Per-agent token usage, USD cost estimation, budget limits with alerts |
 | [Agent Communication](/agent-communication) | Agent-to-agent message bus with approval policies and audit trail |
 | [Foxbridge CDP Proxy](/foxbridge) | Embedded CDP server — OpenClaw controls Camoufox as if it were Chrome |
-| [MCP Browser Tools](/mcp-tools) | 12 browser tools for navigate, snapshot, click, type, screenshot, scroll |
+| [MCP Browser Tools](/mcp-tools) | 36 tools for browser control, reliability checks, human-like actions, extension surfaces, and Android device bridging |
+| [Vulpine API Features](/api-features) | Public product surface for Vulpine Vault, AudioBridge, MobileBridge, Vulpine Mark, and hosted extraction |
 | [Remote Access](/remote) | TLS WebSocket server for headless VPS deployment |
 | [Docker](/docker) | One-click container with Vulpine-Box |
 | Per-Agent Fingerprints | BrowserForge pipeline — unique UA, screen, WebGL, canvas/audio seeds per agent |
@@ -75,7 +76,7 @@ Beyond the browser engine security phases, VulpineOS is a complete agent managem
 
 ## Architecture
 
-VulpineOS ships as a single Go binary with 22 packages, an embedded web panel, and an embedded foxbridge CDP server — all sharing a single Camoufox instance:
+VulpineOS ships as a single Go binary with 36 packages, an embedded web panel, and an embedded foxbridge CDP server — all sharing a single Camoufox instance:
 
 ```
 ┌─────────────────────────────────────────┐
@@ -107,5 +108,5 @@ VulpineOS is a personal project by Elliot, forked from [Camoufox](https://github
 - [Getting Started](/getting-started) — install and launch your first agent
 - [Architecture](/architecture) — single-process runtime overview
 - [Injection-Proof Filter](/injection-filter) — how VulpineOS blocks prompt injection
-- [MCP Browser Tools](/mcp-tools) — 12 tools for AI agent browser control
+- [MCP Browser Tools](/mcp-tools) — 36 tools for AI agent browser control
 - [Foxbridge CDP Proxy](/foxbridge) — embedded CDP server for OpenClaw

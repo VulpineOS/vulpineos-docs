@@ -1,6 +1,6 @@
 ---
-title: "MCP Browser Tools — 12 Tools for AI Agent Browser Control"
-description: "VulpineOS MCP tools: navigate, snapshot, click, type, screenshot, scroll, new_context, close_context, get_ax_tree, and more for OpenClaw agents."
+title: "MCP Browser Tools — 36 Tools for AI Agent Browser Control"
+description: "VulpineOS MCP tools: browser control, reliability checks, human-like actions, annotated screenshots, credential, audio, and Android mobile bridge tools for OpenClaw agents."
 ---
 
 # MCP Tools
@@ -11,19 +11,26 @@ VulpineOS provides a [Model Context Protocol](https://spec.modelcontextprotocol.
 ./vulpineos --mcp-server
 ```
 
-## Available Tools (12)
+## Available Tools (36)
 
-### vulpine_snapshot
+### Core Browser Control
 
-Get a token-optimized DOM snapshot (Phase 3). The primary tool agents use to understand the page — returns >50% fewer tokens than raw HTML. Interactive elements include `@ref` identifiers for click/type by reference.
+| Tool | Description |
+|------|-------------|
+| `vulpine_navigate` | Navigate a session to a URL |
+| `vulpine_snapshot` | Token-optimized semantic DOM with `@ref` identifiers |
+| `vulpine_click` | Click at page coordinates |
+| `vulpine_type` | Type into the focused element |
+| `vulpine_screenshot` | Capture a base64 PNG screenshot |
+| `vulpine_scroll` | Scroll by pixel delta |
+| `vulpine_new_context` | Create an isolated browser context and page |
+| `vulpine_close_context` | Close a browser context |
+| `vulpine_get_ax_tree` | Read the injection-filtered accessibility tree |
+| `vulpine_click_ref` | Click by `@ref` from `vulpine_snapshot` |
+| `vulpine_type_ref` | Focus and type by `@ref` |
+| `vulpine_hover_ref` | Hover by `@ref` |
 
-| Param | Type | Description |
-|-------|------|-------------|
-| `sessionId` | string | Target page session ID |
-| `maxDepth` | number | Max tree depth (default 10) |
-| `maxNodes` | number | Max nodes (default 500) |
-| `maxTextLength` | number | Max text per node (default 200) |
-| `viewportOnly` | boolean | Only return elements visible in viewport (default false) |
+`vulpine_snapshot` is the primary page-reading tool. It returns compressed DOM with element refs:
 
 ```json
 {
@@ -32,7 +39,6 @@ Get a token-optimized DOM snapshot (Phase 3). The primary tool agents use to und
 }
 ```
 
-Returns compressed DOM with element refs:
 ```json
 {"v":1,"title":"Example","url":"https://example.com","nodes":[
   [0,"doc","Example"],
@@ -41,124 +47,51 @@ Returns compressed DOM with element refs:
 ]}
 ```
 
-### vulpine_click_ref
+### Reliability And Interaction
 
-Click an element by its `@ref` from the snapshot. Resolves the element's position, scrolls it into view, and dispatches mouse events.
+| Tool | Description |
+|------|-------------|
+| `vulpine_wait` | Wait for an element, text, network idle, stable DOM, or URL substring |
+| `vulpine_find` | Search interactive elements by text, label, placeholder, or role |
+| `vulpine_verify` | Check state after an action: exists, visible, checked, value, text, URL, title |
+| `vulpine_screenshot_diff` | Compare screenshot checkpoints for visual changes |
+| `vulpine_page_settled` | Wait for ready state, DOM stability, and pending images |
+| `vulpine_select_option` | Select dropdown options by value or visible text |
+| `vulpine_fill_form` | Fill multiple form fields in one call |
+| `vulpine_page_info` | Summarize page URL, title, scroll, forms, buttons, links, and modals |
+| `vulpine_press_key` | Press keys and shortcuts with modifiers |
+| `vulpine_clear_input` | Clear focused or selected input text |
+| `vulpine_get_form_errors` | Extract HTML5, CSS, and ARIA form validation errors |
 
-```json
-{
-  "name": "vulpine_click_ref",
-  "arguments": { "sessionId": "sess-1", "ref": "@1" }
-}
-```
+### Human Realism
 
-### vulpine_type_ref
+| Tool | Description |
+|------|-------------|
+| `vulpine_human_click` | Move and click with natural timing, curves, and jitter |
+| `vulpine_human_type` | Type with variable human-like cadence |
+| `vulpine_human_scroll` | Scroll with inertial timing |
 
-Focus an element by its `@ref` and type text into it.
+### Extension Surfaces
 
-```json
-{
-  "name": "vulpine_type_ref",
-  "arguments": { "sessionId": "sess-1", "ref": "@0", "text": "hello world" }
-}
-```
+These tools expose stable VulpineOS feature surfaces. Open-source builds return graceful unavailable errors when a provider is not present; commercial/private builds can attach their own providers without exposing implementation source.
 
-### vulpine_hover_ref
-
-Hover over an element by its `@ref`.
-
-```json
-{
-  "name": "vulpine_hover_ref",
-  "arguments": { "sessionId": "sess-1", "ref": "@2" }
-}
-```
-
-### vulpine_navigate
-
-Navigate to a URL.
-
-```json
-{
-  "name": "vulpine_navigate",
-  "arguments": { "sessionId": "sess-1", "url": "https://example.com" }
-}
-```
-
-### vulpine_click
-
-Click at specific pixel coordinates.
+| Tool | Description |
+|------|-------------|
+| `vulpine_annotated_screenshot` | Screenshot with durable `@N` labels for interactive elements |
+| `vulpine_click_label` | Click an element from the latest annotated screenshot by label |
+| `vulpine_get_credential` | Return stored credential metadata for a site, never plaintext |
+| `vulpine_autofill` | Ask the credential provider to fill username and password fields |
+| `vulpine_start_audio_capture` | Start an audio capture session |
+| `vulpine_stop_audio_capture` | Stop an audio capture session |
+| `vulpine_read_audio_chunk` | Read base64 audio bytes from a capture session |
+| `vulpine_list_mobile_devices` | List mobile devices visible to the bridge provider |
+| `vulpine_connect_mobile_device` | Start a local CDP bridge to an Android device and return an endpoint |
+| `vulpine_disconnect_mobile_device` | Stop a mobile bridge session |
 
 ```json
 {
-  "name": "vulpine_click",
-  "arguments": { "sessionId": "sess-1", "x": 400, "y": 300 }
-}
-```
-
-### vulpine_type
-
-Type text into the currently focused element.
-
-```json
-{
-  "name": "vulpine_type",
-  "arguments": { "sessionId": "sess-1", "text": "search query" }
-}
-```
-
-### vulpine_screenshot
-
-Capture a page screenshot (returns base64 PNG).
-
-```json
-{
-  "name": "vulpine_screenshot",
-  "arguments": { "sessionId": "sess-1" }
-}
-```
-
-### vulpine_scroll
-
-Scroll the page by a specified amount.
-
-```json
-{
-  "name": "vulpine_scroll",
-  "arguments": { "sessionId": "sess-1", "deltaY": 500 }
-}
-```
-
-### vulpine_new_context
-
-Create a new isolated browser context with its own cookies, storage, and fingerprint.
-
-```json
-{
-  "name": "vulpine_new_context",
-  "arguments": {}
-}
-```
-
-### vulpine_close_context
-
-Close a browser context and release its resources.
-
-```json
-{
-  "name": "vulpine_close_context",
-  "arguments": { "contextId": "ctx-a8f2" }
-}
-```
-
-### vulpine_get_ax_tree
-
-Get the raw accessibility tree (injection-filtered). Use `vulpine_snapshot` for token efficiency — this is for compatibility.
-
-```json
-{
-  "name": "vulpine_get_ax_tree",
-  "arguments": { "sessionId": "sess-1" }
+  "name": "vulpine_connect_mobile_device",
+  "arguments": { "udid": "R58N12ABCDE" }
 }
 ```
 

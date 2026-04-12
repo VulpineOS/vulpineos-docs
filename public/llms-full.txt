@@ -2,7 +2,7 @@
 
 > Operate Stealth and Secure OpenClaw Agents at Scale
 
-VulpineOS is the operating system for AI browser agents. Built on Camoufox (a hardened Firefox 146.0.1 fork originally created by daijro), it manages hundreds of OpenClaw agents with unique identities, full security, and zero detection. VulpineOS ships as a single Go binary with 22 packages, an embedded web panel, an embedded foxbridge CDP server, and a terminal-based TUI — all sharing a single Camoufox browser process.
+VulpineOS is the operating system for AI browser agents. Built on Camoufox (a hardened Firefox 146.0.1 fork originally created by daijro), it manages hundreds of OpenClaw agents with unique identities, full security, and zero detection. VulpineOS ships as a single Go binary with 36 packages, an embedded web panel, an embedded foxbridge CDP server, and a terminal-based TUI — all sharing a single Camoufox browser process.
 
 - Documentation: https://docs.vulpineos.com
 - Repository: https://github.com/PopcornDev1/VulpineOS
@@ -169,26 +169,33 @@ Files: `internal/tokenopt/viewport.go`, `internal/tokenopt/cache.go`, `internal/
 
 ---
 
-## MCP Tools (12 Browser Tools)
+## MCP Tools (36 Tools)
 
-VulpineOS provides a Model Context Protocol server (`./vulpineos --mcp-server`) exposing browser automation as tool calls:
+VulpineOS provides a Model Context Protocol server (`./vulpineos --mcp-server`) exposing browser automation, reliability checks, human-like actions, and extension surfaces as tool calls:
 
-1. **vulpine_snapshot** — Token-optimized DOM snapshot (Phase 3) with `@ref` identifiers for elements. Params: sessionId, maxDepth, maxNodes, maxTextLength, viewportOnly.
-2. **vulpine_click_ref** — Click element by `@ref` from snapshot. Auto-scrolls into view.
-3. **vulpine_type_ref** — Focus element by `@ref` and type text.
-4. **vulpine_hover_ref** — Hover over element by `@ref`.
-5. **vulpine_navigate** — Navigate to URL.
-6. **vulpine_click** — Click at pixel coordinates (x, y).
-7. **vulpine_type** — Type text into focused element.
-8. **vulpine_screenshot** — Capture page screenshot (base64 PNG).
-9. **vulpine_scroll** — Scroll page by deltaY.
-10. **vulpine_new_context** — Create isolated browser context with own cookies, storage, fingerprint.
-11. **vulpine_close_context** — Close browser context and release resources.
-12. **vulpine_get_ax_tree** — Raw accessibility tree (injection-filtered). Use vulpine_snapshot for token efficiency.
+Core browser controls: vulpine_navigate, vulpine_snapshot, vulpine_click, vulpine_type, vulpine_screenshot, vulpine_scroll, vulpine_new_context, vulpine_close_context, vulpine_get_ax_tree, vulpine_click_ref, vulpine_type_ref, vulpine_hover_ref.
+
+Reliability and interaction tools: vulpine_wait, vulpine_find, vulpine_verify, vulpine_screenshot_diff, vulpine_page_settled, vulpine_select_option, vulpine_fill_form, vulpine_page_info, vulpine_press_key, vulpine_clear_input, vulpine_get_form_errors.
+
+Human-realism tools: vulpine_human_click, vulpine_human_type, vulpine_human_scroll.
+
+Extension surfaces: vulpine_annotated_screenshot, vulpine_click_label, vulpine_get_credential, vulpine_autofill, vulpine_start_audio_capture, vulpine_stop_audio_capture, vulpine_read_audio_chunk, vulpine_list_mobile_devices, vulpine_connect_mobile_device, vulpine_disconnect_mobile_device.
 
 Recommended workflow: snapshot -> read @refs -> click_ref/type_ref -> snapshot again. Refs resolve to actual DOM elements, scroll into view, and compute center point automatically.
 
 Files: `internal/mcp/`
+
+---
+
+## Vulpine API Features
+
+Product names and capabilities are public; source availability depends on whether the component is open infrastructure or a commercial extension.
+
+Open source components: VulpineOS (runtime, MCP tools, web panel, TUI, remote server), Foxbridge (CDP-to-Firefox bridge), Vulpine Mark (Set-of-Mark screenshots and label interactions), MobileBridge for Android (Android discovery, CDP proxying, gestures, and sessions).
+
+Commercial extension surfaces: Vulpine Vault (credential metadata, autofill, secure input, TOTP, provider imports), AudioBridge (browser audio capture and audio chunk streaming), MobileBridge for iOS (iOS discovery, Web Inspector bridging, mobile sessions), Vulpine API (hosted extraction, browser sessions, account operations, billing, fleet controls).
+
+Stable MCP mappings: Set-of-Mark uses vulpine_annotated_screenshot and vulpine_click_label. Vulpine Vault uses vulpine_get_credential and vulpine_autofill. AudioBridge uses vulpine_start_audio_capture, vulpine_stop_audio_capture, and vulpine_read_audio_chunk. MobileBridge uses vulpine_list_mobile_devices, vulpine_connect_mobile_device, and vulpine_disconnect_mobile_device.
 
 ---
 
@@ -328,7 +335,7 @@ WebSocket multiplexes: juggler messages (bidirectional), control commands (clien
 
 One-click container: `docker compose up -d`. Multi-stage build: Go binary (CGO_ENABLED=0, stripped) + Ubuntu 22.04 + GTK/X11 + Xvfb + Camoufox + Node.js/OpenClaw.
 
-Persistent volumes: vulpine-vault (/root/.vulpineos for SQLite vault, agents, config), vulpine-profiles (/root/.camoufox for browser profiles/cache). 4GB memory limit (supports 20-30 concurrent contexts). TLS via mounted certificates.
+Persistent volumes: vulpineos-data (/root/.vulpineos for SQLite vault, agents, config), vulpine-profiles (/opt/vulpineos/profiles for browser profiles/cache). 4GB memory limit (supports 20-30 concurrent contexts). TLS via mounted certificates.
 
 ---
 
@@ -369,7 +376,7 @@ JSON structured logger with levels (Debug/Info/Warn/Error), component tags, fiel
 
 ## Testing
 
-283 Go tests across 22 packages, all passing with race detector. 29 API endpoints verified. 11 web panel pages. Full OpenClaw integration tested end-to-end. Foxbridge: 74/74 Juggler Puppeteer tests, 62/62 BiDi tests, 227 Go unit tests.
+350+ Go tests across 36 packages, all passing with race detector. 29 API endpoints verified. 11 web panel pages. Full OpenClaw integration tested end-to-end. Foxbridge: 74/74 Juggler Puppeteer tests, 62/62 BiDi tests, 227 Go unit tests.
 
 ---
 

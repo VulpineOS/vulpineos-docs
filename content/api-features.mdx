@@ -1,0 +1,47 @@
+---
+title: "Vulpine API Features — Public Products and Source Availability"
+description: "Vulpine API feature surface across open-source VulpineOS components and source-closed commercial extensions."
+---
+
+# Vulpine API Features
+
+Vulpine API packages the VulpineOS browser-agent stack into commercial endpoints. Product names and capabilities are public; source availability depends on whether the component is open infrastructure or a commercial extension.
+
+## Open Source Components
+
+| Product | Source | API Surface |
+|---------|--------|-------------|
+| VulpineOS | Public | Browser-agent runtime, MCP tools, web panel, TUI, remote server, agent orchestration |
+| Foxbridge | Public | CDP-to-Firefox bridge for OpenClaw, Puppeteer, and CDP clients |
+| Vulpine Mark | Public | Set-of-Mark screenshots, element labels, click/type/hover by label |
+| MobileBridge for Android | Public | Android device discovery, CDP proxying, gestures, and device sessions |
+
+## Commercial Extension Surfaces
+
+| Product | Source | API Surface |
+|---------|--------|-------------|
+| Vulpine Vault | Source-closed | Credential metadata, autofill, secure input, TOTP, and provider imports |
+| AudioBridge | Source-closed | Browser audio capture sessions and audio chunk streaming |
+| MobileBridge for iOS | Source-closed | iOS device discovery, Web Inspector bridging, and mobile sessions |
+| Vulpine API | Source-closed | Hosted extraction, browser sessions, account operations, billing, and fleet controls |
+
+## MCP Mapping
+
+The public MCP surface exposes stable tool names so clients can integrate once:
+
+| Capability | Tools |
+|------------|-------|
+| Set-of-Mark | `vulpine_annotated_screenshot`, `vulpine_click_label` |
+| Vulpine Vault | `vulpine_get_credential`, `vulpine_autofill` |
+| AudioBridge | `vulpine_start_audio_capture`, `vulpine_stop_audio_capture`, `vulpine_read_audio_chunk` |
+| MobileBridge | `vulpine_list_mobile_devices`, `vulpine_connect_mobile_device`, `vulpine_disconnect_mobile_device` |
+
+Open-source builds return clear unavailable errors for commercial extension surfaces when no provider is attached. Commercial builds can enable the same public tool names without changing client code.
+
+---
+
+## See also
+
+- [MCP Browser Tools](/mcp-tools) — 36 tools for AI agent browser control
+- [Foxbridge CDP Proxy](/foxbridge) — embedded CDP server for OpenClaw
+- [Docker Deployment](/docker) — Vulpine-Box server deployment

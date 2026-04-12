@@ -30,6 +30,7 @@ export default {
   'web-panel': 'Web Panel',
   tui: 'TUI Workbench',
   'mcp-tools': 'MCP Tools',
+  'api-features': 'Vulpine API Features',
   foxbridge: 'Foxbridge CDP Proxy',
   '---deploy': {
     title: 'Deployment',
