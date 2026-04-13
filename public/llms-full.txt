@@ -195,13 +195,15 @@ Open source components: VulpineOS (runtime, MCP tools, web panel, TUI, remote se
 
 Commercial extension surfaces: Vulpine Vault (credential metadata, autofill, secure input, TOTP, provider imports), AudioBridge (browser audio capture and audio chunk streaming), MobileBridge for iOS (iOS discovery, Web Inspector bridging, mobile sessions), Vulpine API (hosted extraction, browser sessions, recurring monitors, account operations, billing, fleet controls).
 
-Current Vulpine API endpoints: extraction (`POST /v1/extract`), batch extraction (`POST /v1/batch`), async task polling and cancellation, extraction history, recurring monitors, usage, API keys, and provider listing. Extraction accepts JSON Schema or natural-language prompts, supports sync and async execution, can opt into pagination, and returns usage metadata such as completeness, token count, retries, and estimated cost.
+Current Vulpine API endpoints: extraction (`POST /v1/extract`), batch extraction (`POST /v1/batch`), async task polling and cancellation, extraction history, recurring monitors, usage, API keys, and provider listing. Extraction accepts JSON Schema or natural-language prompts, supports sync and async execution, can opt into pagination, and returns usage metadata such as completeness, token count, retries, and estimated cost. The dedicated API reference documents endpoint auth, payloads, response shapes, monitor limitations, and SDK examples.
 
 Planned commercial products: Vulpine Sentinel (stealth health monitoring for browser-agent fleets), Vulpine Replay (deterministic debugging and audit bundles), Vulpine Clockwork (mid-session identity rotation), Vulpine Prism (managed third-party behavior controls), Vulpine Pulse (human behavior modeling), Vulpine Forge (automation for WebAssembly-heavy apps), Vulpine Scribe (deep network traces), Vulpine Harbor (virtual file workspace), Vulpine Mesh (high-throughput browser-agent transport), and Vulpine Oracle (JavaScript execution recording and analysis). These are public product names; source code and implementation details remain source-closed unless explicitly noted.
 
 Planned API feature families include authenticated extraction, visual extraction, browser audio workflows, mobile extraction, protected crawl, and recurring monitors. These are commercial hosted API surfaces built on the open-source runtime plus source-closed extensions.
 
 Stable MCP mappings: Set-of-Mark uses vulpine_annotated_screenshot and vulpine_click_label. Vulpine Vault uses vulpine_get_credential and vulpine_autofill. AudioBridge uses vulpine_start_audio_capture, vulpine_stop_audio_capture, and vulpine_read_audio_chunk. MobileBridge uses vulpine_list_mobile_devices, vulpine_connect_mobile_device, and vulpine_disconnect_mobile_device.
+
+Public docs include a launch checklist covering source boundaries, docs drift checks, visual review, API preview verification, Linear handoff, and release commands.
 
 ---
 

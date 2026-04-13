@@ -1,0 +1,319 @@
+---
+title: "Vulpine API Reference"
+description: "Vulpine API endpoint reference for extraction, async tasks, monitors, usage, API keys, providers, and batch jobs."
+---
+
+# Vulpine API Reference
+
+Vulpine API is the hosted commercial API for VulpineOS browser extraction. It uses real browser sessions when available, falls back to HTTP fetches where appropriate, and returns structured JSON with usage metadata.
+
+Base URL:
+
+```txt
+https://api.vulpineos.com
+```
+
+Local development:
+
+```txt
+http://localhost:8080
+```
+
+## Authentication
+
+All `/v1/*` endpoints except `/v1/providers` require a bearer token:
+
+```http
+Authorization: Bearer vk_live_...
+```
+
+The health endpoint is public.
+
+## Endpoints
+
+| Method | Path | Auth | Purpose |
+|--------|------|------|---------|
+| `GET` | `/health` | No | Service health |
+| `GET` | `/v1/providers` | No | Available LLM providers and models |
+| `POST` | `/v1/extract` | Yes | Extract structured data from one URL |
+| `POST` | `/v1/batch` | Yes | Queue batch extraction jobs |
+| `GET` | `/v1/extractions` | Yes | List extraction history |
+| `GET` | `/v1/tasks/{id}` | Yes | Poll an async task |
+| `POST` | `/v1/tasks/{id}/cancel` | Yes | Cancel a queued/running task |
+| `GET` | `/v1/usage` | Yes | Current usage and cost metadata |
+| `GET` | `/v1/keys` | Yes | List API keys |
+| `POST` | `/v1/keys` | Yes | Create an API key |
+| `POST` | `/v1/monitor` | Yes | Create a recurring extraction monitor |
+| `GET` | `/v1/monitors` | Yes | List monitors |
+| `DELETE` | `/v1/monitors/{id}` | Yes | Delete a monitor |
+
+## Extract
+
+```http
+POST /v1/extract
+```
+
+Use a JSON Schema when you know the target shape:
+
+```json
+{
+  "url": "https://example.com/product/123",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": { "type": "string" },
+      "price": { "type": "number" }
+    },
+    "required": ["name", "price"]
+  }
+}
+```
+
+Use a prompt when the schema is not fixed:
+
+```json
+{
+  "url": "https://example.com/catalog",
+  "prompt": "Extract product names, prices, and availability from this page."
+}
+```
+
+Use async mode for long jobs:
+
+```json
+{
+  "url": "https://example.com/catalog",
+  "prompt": "Extract all products.",
+  "async": true
+}
+```
+
+Use pagination when the target spans multiple pages:
+
+```json
+{
+  "url": "https://example.com/catalog",
+  "prompt": "Extract product names and prices from every catalog page.",
+  "options": {
+    "paginate": true,
+    "max_pages": 5,
+    "next_selector": "a[rel='next']"
+  }
+}
+```
+
+Response shape:
+
+```json
+{
+  "status": "completed",
+  "data": { "name": "Example Product", "price": 19.99 },
+  "metadata": {
+    "completeness": 1,
+    "tokens": 1240,
+    "cost": 0.0021,
+    "duration_ms": 3810,
+    "pages": 1
+  },
+  "free_tier_remaining": 99
+}
+```
+
+Partial responses keep the same shape with `status: "partial"` and metadata explaining missing fields or retry behavior.
+
+## Batch
+
+```http
+POST /v1/batch
+```
+
+Queues up to 100 URLs with the same schema or prompt. Batch jobs are always asynchronous.
+
+```json
+{
+  "urls": [
+    "https://example.com/a",
+    "https://example.com/b"
+  ],
+  "schema": {
+    "type": "object",
+    "properties": {
+      "title": { "type": "string" }
+    }
+  }
+}
+```
+
+Response:
+
+```json
+{
+  "tasks": [
+    { "id": "task_1", "poll": "/v1/tasks/task_1" },
+    { "id": "task_2", "poll": "/v1/tasks/task_2" }
+  ]
+}
+```
+
+## Tasks
+
+Poll an async task:
+
+```http
+GET /v1/tasks/{id}
+```
+
+Cancel a pending or running task:
+
+```http
+POST /v1/tasks/{id}/cancel
+```
+
+Task response:
+
+```json
+{
+  "id": "task_123",
+  "status": "completed",
+  "result": {
+    "data": { "title": "Example" },
+    "metadata": { "completeness": 1 }
+  }
+}
+```
+
+Statuses are `queued`, `running`, `completed`, `failed`, or `canceled`.
+
+## Extraction History
+
+```http
+GET /v1/extractions
+```
+
+Returns recent extraction tasks and metadata for the authenticated tenant.
+
+## Usage
+
+```http
+GET /v1/usage
+```
+
+Returns monthly extraction count, token totals, and estimated cost metadata.
+
+## API Keys
+
+List keys:
+
+```http
+GET /v1/keys
+```
+
+Create a key:
+
+```http
+POST /v1/keys
+```
+
+```json
+{
+  "name": "Production worker"
+}
+```
+
+Key creation returns the secret once. Store it immediately.
+
+## Providers
+
+```http
+GET /v1/providers
+```
+
+Returns available model providers and supported model identifiers.
+
+## Monitors
+
+Create a recurring extraction monitor:
+
+```http
+POST /v1/monitor
+```
+
+```json
+{
+  "url": "https://example.com/pricing",
+  "prompt": "Extract the current plan prices.",
+  "interval_seconds": 3600,
+  "max_runs": 24,
+  "webhook_url": "https://example.com/webhooks/vulpine"
+}
+```
+
+List monitors:
+
+```http
+GET /v1/monitors
+```
+
+Delete a monitor:
+
+```http
+DELETE /v1/monitors/{id}
+```
+
+Current monitor scheduling enqueues recurring extraction jobs. Change detection, condition evaluation, and richer webhook change payloads are tracked separately in the paid API backlog.
+
+## Errors
+
+Errors return JSON:
+
+```json
+{
+  "error": "missing url"
+}
+```
+
+Common status codes:
+
+| Status | Meaning |
+|--------|---------|
+| `400` | Invalid request body or missing required field |
+| `401` | Missing or invalid API key |
+| `404` | Task or monitor not found |
+| `429` | Rate limit or quota exceeded |
+| `500` | Internal execution error |
+
+## SDKs
+
+TypeScript:
+
+```ts
+import { Vulpine } from '@vulpineos/sdk'
+
+const client = new Vulpine({ apiKey: process.env.VULPINE_API_KEY })
+const result = await client.extract({
+  url: 'https://example.com/catalog',
+  prompt: 'Extract product names and prices',
+  options: { paginate: true, max_pages: 5 }
+})
+```
+
+Python:
+
+```py
+from vulpineos import Vulpine, ExtractRequest
+
+client = Vulpine(api_key=os.environ["VULPINE_API_KEY"])
+result = client.extract(ExtractRequest(
+    url="https://example.com/catalog",
+    prompt="Extract product names and prices",
+    options={"paginate": True, "max_pages": 5},
+))
+```
+
+---
+
+## See also
+
+- [Vulpine API Features](/api-features) — product surface and planned endpoint families
+- [Source Availability](/source-availability) — open-source and source-closed boundaries
+- [MCP Browser Tools](/mcp-tools) — local agent/browser control tools

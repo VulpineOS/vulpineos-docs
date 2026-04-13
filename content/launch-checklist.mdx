@@ -1,0 +1,114 @@
+---
+title: "Launch Checklist"
+description: "Release and launch checklist for VulpineOS open-source docs, API docs, landing pages, source boundaries, and verification."
+---
+
+# Launch Checklist
+
+Use this checklist before a public release, paid API preview, or major docs update.
+
+## Source Boundary
+
+- Public repos contain only open-source code, public interfaces, no-op stubs, and approved product wording.
+- Source-closed implementation code stays in private repos.
+- Public docs may name source-closed products, but must not include private source, private patch contents, credentials, local private paths, or operational details.
+- Public history scan has been run for secrets and private-boundary terms.
+- Release artifacts do not include private docs, source patches, local overlays, debug symbols with sensitive paths, or secrets.
+
+## Documentation
+
+- Getting Started, Architecture, Build, Docker, Remote, MCP Tools, Web Panel, API Features, API Reference, and Source Availability are current.
+- MCP tool count matches VulpineOS code.
+- Go package/test counts match VulpineOS code.
+- Web panel page count and control message count match VulpineOS code.
+- `llms.txt` and `llms-full.txt` match the current product surface.
+- Sitemap includes all public docs pages.
+- Broken links and stale product names have been checked.
+
+Run:
+
+```bash
+npm run audit:docs
+npm run build
+```
+
+## Product Copy
+
+- VulpineOS is positioned as the open-source browser-agent runtime.
+- Vulpine API is positioned as the source-closed hosted commercial API.
+- Vulpine Vault, AudioBridge, and iOS MobileBridge are described as commercial/source-closed surfaces.
+- Vulpine Mark, Android MobileBridge, Foxbridge, and VulpineOS are described as open-source surfaces.
+- Planned products are described as roadmap items, not shipped functionality.
+
+## Visual Review
+
+- Landing pages reviewed on desktop and mobile.
+- Primary CTAs are visible and accurate.
+- Screenshots or demos show current UI and product names.
+- Playwright MCP screenshots are saved to files rather than pasted inline.
+
+Use the local browser MCP:
+
+```txt
+http://localhost:8931/mcp
+```
+
+Artifacts should go to:
+
+```txt
+~/.codex/mcp-output/playwright
+```
+
+## API Preview
+
+- `/health` responds.
+- `/v1/providers` responds without auth.
+- Authenticated endpoints reject missing or invalid keys.
+- `POST /v1/extract` works with schema input.
+- `POST /v1/extract` works with prompt input.
+- Async extraction returns a task ID and poll URL.
+- Pagination options are documented and covered by tests.
+- Monitor endpoints are documented with current limitations.
+- Usage and API key endpoints are documented.
+
+## Linear
+
+- Release work is represented in Linear.
+- Closed issues have commit links.
+- Remaining work is explicitly tracked as Backlog or Todo.
+- Owner assignments are set before more than one person starts implementation.
+
+## Release Commands
+
+Docs:
+
+```bash
+npm run audit:docs
+npm run build
+git status --short
+```
+
+VulpineOS:
+
+```bash
+go build ./internal/... ./cmd/...
+go vet ./internal/... ./cmd/...
+go test ./internal/... ./cmd/... -race
+go build -o vulpineos ./cmd/vulpineos
+```
+
+Public boundary scan:
+
+```bash
+python3 ~/.codex/bin/vulpine-dev-mcp.py
+```
+
+In Codex, use the `vulpine-dev` MCP tool `vulpine_boundary_scan`.
+
+---
+
+## See also
+
+- [Source Availability](/source-availability)
+- [Vulpine API Reference](/api-reference)
+- [MCP Browser Tools](/mcp-tools)

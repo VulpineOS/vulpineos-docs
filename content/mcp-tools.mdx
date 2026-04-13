@@ -47,6 +47,22 @@ VulpineOS provides a [Model Context Protocol](https://spec.modelcontextprotocol.
 ]}
 ```
 
+Coordinate actions are available when the agent already has a precise point:
+
+```json
+{ "name": "vulpine_click", "arguments": { "sessionId": "sess-1", "x": 640, "y": 420 } }
+```
+
+Ref-based actions are preferred when a snapshot has returned `@ref` handles:
+
+```json
+{ "name": "vulpine_click_ref", "arguments": { "sessionId": "sess-1", "ref": "@1" } }
+```
+
+```json
+{ "name": "vulpine_type_ref", "arguments": { "sessionId": "sess-1", "ref": "@2", "text": "hello@example.com" } }
+```
+
 ### Reliability And Interaction
 
 | Tool | Description |
@@ -63,6 +79,55 @@ VulpineOS provides a [Model Context Protocol](https://spec.modelcontextprotocol.
 | `vulpine_clear_input` | Clear focused or selected input text |
 | `vulpine_get_form_errors` | Extract HTML5, CSS, and ARIA form validation errors |
 
+Wait before acting, then verify the result:
+
+```json
+{ "name": "vulpine_wait", "arguments": { "sessionId": "sess-1", "condition": "element", "selector": "button[type='submit']", "timeout": 10 } }
+```
+
+```json
+{ "name": "vulpine_verify", "arguments": { "sessionId": "sess-1", "check": "url", "expected": "/dashboard" } }
+```
+
+Use `vulpine_find` when a snapshot is not enough:
+
+```json
+{ "name": "vulpine_find", "arguments": { "sessionId": "sess-1", "query": "Continue", "role": "button", "maxResults": 3 } }
+```
+
+Use screenshot checkpoints to confirm an interaction changed the page:
+
+```json
+{ "name": "vulpine_screenshot_diff", "arguments": { "sessionId": "sess-1", "label": "before_submit" } }
+```
+
+```json
+{ "name": "vulpine_screenshot_diff", "arguments": { "sessionId": "sess-1", "label": "after_submit" } }
+```
+
+Fill and validate forms without spending extra LLM turns:
+
+```json
+{
+  "name": "vulpine_fill_form",
+  "arguments": {
+    "sessionId": "sess-1",
+    "fields": {
+      "input[name='email']": "hello@example.com",
+      "input[name='name']": "Elliot"
+    }
+  }
+}
+```
+
+```json
+{ "name": "vulpine_select_option", "arguments": { "sessionId": "sess-1", "selector": "select[name='plan']", "value": "pro" } }
+```
+
+```json
+{ "name": "vulpine_get_form_errors", "arguments": { "sessionId": "sess-1", "selector": "form" } }
+```
+
 ### Human Realism
 
 | Tool | Description |
@@ -70,6 +135,16 @@ VulpineOS provides a [Model Context Protocol](https://spec.modelcontextprotocol.
 | `vulpine_human_click` | Move and click with natural timing, curves, and jitter |
 | `vulpine_human_type` | Type with variable human-like cadence |
 | `vulpine_human_scroll` | Scroll with inertial timing |
+
+Human-realism tools are useful when the task should look less mechanical:
+
+```json
+{ "name": "vulpine_human_click", "arguments": { "sessionId": "sess-1", "x": 540, "y": 310, "speed": "normal" } }
+```
+
+```json
+{ "name": "vulpine_human_type", "arguments": { "sessionId": "sess-1", "text": "natural text entry", "wpm": 55 } }
+```
 
 ### Extension Surfaces
 
@@ -88,10 +163,68 @@ These tools expose stable VulpineOS feature surfaces. Open-source builds return 
 | `vulpine_connect_mobile_device` | Start a local CDP bridge to an Android device and return an endpoint |
 | `vulpine_disconnect_mobile_device` | Stop a mobile bridge session |
 
+Annotated screenshots pair a PNG with a structured element list. The labels can be clicked later without re-solving coordinates:
+
+```json
+{ "name": "vulpine_annotated_screenshot", "arguments": { "sessionId": "sess-1", "format": "png", "maxElements": 80 } }
+```
+
+```json
+{ "name": "vulpine_click_label", "arguments": { "session_id": "sess-1", "label": "@7" } }
+```
+
+Credential tools never return plaintext passwords. Public builds return an unavailable error when no credential provider is registered:
+
+```json
+{ "name": "vulpine_get_credential", "arguments": { "site_url": "https://example.com/login" } }
+```
+
+```json
+{
+  "name": "vulpine_autofill",
+  "arguments": {
+    "site_url": "https://example.com/login",
+    "page_id": "sess-1",
+    "username_selector": "input[name='email']",
+    "password_selector": "input[name='password']"
+  }
+}
+```
+
+Audio tools use capture handles:
+
+```json
+{ "name": "vulpine_start_audio_capture", "arguments": { "format": "wav", "sample_rate": 48000, "channels": 2 } }
+```
+
+```json
+{ "name": "vulpine_read_audio_chunk", "arguments": { "handle_id": "audio-1", "max_bytes": 65536 } }
+```
+
+```json
+{ "name": "vulpine_stop_audio_capture", "arguments": { "handle_id": "audio-1" } }
+```
+
+Mobile bridge tools expose Android bridge sessions in open-source builds and can share the same public API surface with commercial providers:
+
+```json
+{
+  "name": "vulpine_list_mobile_devices",
+  "arguments": {}
+}
+```
+
 ```json
 {
   "name": "vulpine_connect_mobile_device",
   "arguments": { "udid": "R58N12ABCDE" }
+}
+```
+
+```json
+{
+  "name": "vulpine_disconnect_mobile_device",
+  "arguments": { "session_id": "mobile-1" }
 }
 ```
 
@@ -105,6 +238,10 @@ The recommended agent workflow:
 4. Call `vulpine_snapshot` again to see the result
 
 This is more reliable than coordinate-based clicking because refs resolve to the actual DOM element, scroll it into view, and compute the center point automatically.
+
+## Loop Detection
+
+The MCP server tracks repeated identical tool calls. After repeated no-progress calls, it returns a warning telling the agent to reassess with `vulpine_find`, `vulpine_verify`, or `vulpine_page_info`. Navigation resets the loop history.
 
 ## OpenClaw Integration
 

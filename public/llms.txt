@@ -21,7 +21,9 @@ VulpineOS solves the three critical problems with AI browser agents:
 - **Agent Scripting DSL**: JSON-based browser automation without LLM calls.
 - **MCP Tools**: 36 browser, reliability, human-realism, extension, and Android mobile bridge tools.
 - **Vulpine API Features**: Public product surface for Vulpine Vault, AudioBridge, MobileBridge, Vulpine Mark, hosted extraction, recurring monitors, and planned commercial products.
+- **Vulpine API Reference**: Endpoint examples for extraction, batch jobs, async tasks, monitors, usage, API keys, and providers.
 - **Source Availability**: Open-source VulpineOS, Vulpine Mark, Android MobileBridge, Foxbridge, and docs; source-closed Vulpine API, Vulpine Vault, AudioBridge, iOS MobileBridge, and planned commercial products.
+- **Launch Checklist**: Release checks for docs, source boundaries, visual review, API preview, and Linear handoff.
 - **Cost Tracking**: Per-agent token/cost budgets with alerts.
 - **Embedded Foxbridge**: CDP proxy shares single Camoufox instance — OpenClaw controls Firefox as if it were Chrome.
 - **Context Pool**: Pre-warm 10 contexts, max 20 concurrent, auto-recycle.
@@ -35,7 +37,7 @@ VulpineOS solves the three critical problems with AI browser agents:
 
 Open source components: VulpineOS, Foxbridge, Vulpine Mark, and MobileBridge for Android.
 
-Source-closed commercial surfaces: Vulpine Vault, AudioBridge, MobileBridge for iOS, and Vulpine API. Current Vulpine API endpoints cover extraction, batch extraction, async tasks, extraction history, recurring monitors, usage, API keys, and provider listing. Extraction accepts JSON Schema or natural-language prompts, supports sync and async execution, can opt into pagination, and returns usage metadata.
+Source-closed commercial surfaces: Vulpine Vault, AudioBridge, MobileBridge for iOS, and Vulpine API. Current Vulpine API endpoints cover extraction, batch extraction, async tasks, extraction history, recurring monitors, usage, API keys, and provider listing. Extraction accepts JSON Schema or natural-language prompts, supports sync and async execution, can opt into pagination, and returns usage metadata. The public docs include a dedicated API reference with request and response examples.
 
 Planned commercial products: Vulpine Sentinel (stealth health monitoring), Vulpine Replay (deterministic debugging and audit bundles), Vulpine Clockwork (mid-session identity rotation), Vulpine Prism (managed third-party behavior controls), Vulpine Pulse (human behavior modeling), Vulpine Forge (WASM-heavy app automation), Vulpine Scribe (deep network traces), Vulpine Harbor (virtual file workspace), Vulpine Mesh (high-throughput browser-agent transport), and Vulpine Oracle (JavaScript execution recording). These are public product names; source code and implementation details remain source-closed unless explicitly noted.
 
@@ -60,6 +62,7 @@ Foxbridge is a CDP-to-Firefox protocol proxy. It translates Chrome DevTools Prot
 ## Links
 
 - Documentation: https://docs.vulpineos.com
+- API Reference: https://docs.vulpineos.com/api-reference
 - Repository: https://github.com/PopcornDev1/VulpineOS
 - Foxbridge: https://foxbridge.vulpineos.com
 

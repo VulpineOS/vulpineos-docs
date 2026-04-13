@@ -1,6 +1,6 @@
 ---
 title: "Web Panel — Browser Dashboard for VulpineOS Agent Management"
-description: "VulpineOS React web panel: 10-page dashboard for managing agents, proxies, contexts, security, scripts, and settings."
+description: "VulpineOS React web panel: 11-page dashboard for managing agents, proxies, contexts, security, scripts, logs, login, and settings."
 ---
 
 # Web Panel
@@ -25,6 +25,8 @@ vulpineos --serve --port 8443 --api-key mykey --no-tls
 ```
 
 ## Pages
+
+The embedded panel has 11 pages.
 
 ### Dashboard
 
@@ -65,6 +67,10 @@ JSON script editor for the agent scripting DSL. Write scripts with 8 actions (na
 
 Filterable event stream from the kernel WebSocket. Filter by event method name. Shows timestamp, method, and params for each event.
 
+### Login
+
+API-key login screen for remote panel access. The panel stores only the key needed to authenticate its WebSocket session.
+
 ### Settings
 
 Configure LLM provider, model, and API key (persisted to `~/.vulpineos/config.json`). Resource limits: memory per context (MB), default budget per agent (USD). Kernel info: binary path, auto-restart status, context pool configuration.
@@ -73,7 +79,7 @@ Configure LLM provider, model, and API key (persisted to `~/.vulpineos/config.js
 
 The panel communicates via WebSocket control messages to the `PanelAPI` handler. All messages go through the `/ws` endpoint with API key authentication.
 
-29 control message types across 9 domains:
+29 control message types across 9 domains, verified against `internal/remote/api.go`:
 
 | Domain | Messages |
 |--------|----------|
