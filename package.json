@@ -11,16 +11,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PopcornDev1/vulpineos-docs.git"
+    "url": "git+https://github.com/VulpineOS/vulpineos-docs.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "bugs": {
-    "url": "https://github.com/PopcornDev1/vulpineos-docs/issues"
+    "url": "https://github.com/VulpineOS/vulpineos-docs/issues"
   },
-  "homepage": "https://github.com/PopcornDev1/vulpineos-docs#readme",
+  "homepage": "https://github.com/VulpineOS/vulpineos-docs#readme",
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",

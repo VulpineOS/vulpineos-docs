@@ -50,7 +50,7 @@ const logo = (
 const navbar = (
   <Navbar
     logo={logo}
-    projectLink="https://github.com/PopcornDev1/VulpineOS"
+    projectLink="https://github.com/VulpineOS/VulpineOS"
   />
 )
 
@@ -72,7 +72,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               applicationCategory: 'DeveloperApplication',
               operatingSystem: 'macOS, Linux',
               programmingLanguage: ['Go', 'C++', 'JavaScript'],
-              codeRepository: 'https://github.com/PopcornDev1/VulpineOS',
+              codeRepository: 'https://github.com/VulpineOS/VulpineOS',
               author: {
                 '@type': 'Person',
                 name: 'Elliot',
@@ -106,7 +106,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Layout
           navbar={navbar}
           pageMap={await getPageMap()}
-          docsRepositoryBase="https://github.com/PopcornDev1/vulpineos-docs/tree/main/content"
+          docsRepositoryBase="https://github.com/VulpineOS/vulpineos-docs/tree/main/content"
           footer={<></>}
           sidebar={{ defaultMenuCollapseLevel: 1 }}
         >

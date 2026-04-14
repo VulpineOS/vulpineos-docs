@@ -1,6 +1,6 @@
 # VulpineOS Documentation
 
-Documentation site for [VulpineOS](https://github.com/PopcornDev1/VulpineOS) — the operating system for AI browser agents.
+Documentation site for [VulpineOS](https://github.com/VulpineOS/VulpineOS) — the operating system for AI browser agents.
 
 **Live site:** [vulpineos.com](https://vulpineos.com)
 
