@@ -311,6 +311,12 @@ POST /v1/mobile/sessions
 }
 ```
 
+The allocator can return local Android sessions with `transport: "cdp_http"`,
+hosted Android worker sessions with `transport: "worker_control"`, or iOS
+sessions with `transport: "webkit_inspector"`. Target creation is available
+on supported Android and iOS sessions. Screen recording currently remains
+limited to local Android `cdp_http` sessions.
+
 Open a new target on a supported session:
 
 ```http
@@ -330,7 +336,10 @@ Download a completed recording:
 GET /v1/mobile/recordings/{id}/content
 ```
 
-Android sessions expose CDP-backed actions today. iOS sessions expose inventory and attached session flows, with capability differences reflected in responses.
+Android sessions expose CDP-backed actions today, including hosted worker
+sessions that can be attached remotely through the control plane. iOS
+sessions expose inventory and attached session flows, with capability
+difference reflected in responses.
 
 ## Tasks
 
