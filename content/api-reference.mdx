@@ -322,6 +322,11 @@ Workers that stop heartbeating move to stale state, attached
 `worker_control` sessions on those devices are expired, and very old worker
 rows are pruned from the registry entirely.
 
+Worker heartbeats can also report `active_sessions`, `queue_depth`,
+`max_sessions`, `failure_rate`, and `last_error`. The control plane
+surfaces those fields through `GET /v1/mobile/workers` and avoids
+allocating new leases against saturated workers.
+
 Open a new target on a supported session:
 
 ```http
