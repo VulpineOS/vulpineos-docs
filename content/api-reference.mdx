@@ -162,6 +162,8 @@ Mobile session leases are persisted. Session responses may include `expires_at`,
 
 Device inventory responses may also include `health_status`, `failure_streak`, `failed_uses`, and `draining`. Repeated attach or disconnect failures move a device into `draining`, and the session allocator will reject new attaches against draining devices.
 
+Session allocation accepts either an explicit `device_id` or `platform` plus optional `capabilities` and `sticky_key`. Use `sticky_key` when repeated jobs should prefer the same healthy device without exposing a hard-coded device identifier to every caller.
+
 ## Visual Extract
 
 ```http
