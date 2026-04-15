@@ -31,7 +31,7 @@ The hosted API is the commercial surface for teams that want VulpineOS capabilit
 
 | Area | Endpoints | Status |
 |------|-----------|--------|
-| Extraction | `POST /v1/extract`, `POST /v1/extract/authenticated`, `POST /v1/visual`, `POST /v1/batch` | Available in the API service |
+| Extraction | `POST /v1/extract`, `POST /v1/extract/authenticated`, `GET /v1/auth/sessions`, `DELETE /v1/auth/sessions/{name}`, `POST /v1/visual`, `POST /v1/batch` | Available in the API service |
 | Audio workflows | `GET /v1/audio/captures`, `POST /v1/audio/captures`, `GET /v1/audio/captures/{id}/chunk`, `POST /v1/audio/captures/{id}/stop`, `POST /v1/audio/captures/{id}/transcription/start`, `POST /v1/audio/captures/{id}/transcription/stop`, `GET /v1/audio/captures/{id}/transcription/events`, `GET /v1/audio/captures/{id}/transcription/stream` | Available with paid/private wiring |
 | Mobile workflows | `GET /v1/mobile/devices`, `GET /v1/mobile/workers`, `POST /v1/mobile/workers/heartbeat`, `POST /v1/mobile/workers/{id}/maintenance`, `POST /v1/mobile/devices/{platform}/{id}/maintenance`, `GET /v1/mobile/devices/{platform}/{id}/targets`, `GET /v1/mobile/sessions`, `POST /v1/mobile/sessions`, `DELETE /v1/mobile/sessions/{id}`, `POST /v1/mobile/sessions/{id}/renew`, `POST /v1/mobile/sessions/{id}/targets`, `POST /v1/mobile/sessions/{id}/recording/start`, `POST /v1/mobile/sessions/{id}/recording/stop`, `GET /v1/mobile/recordings/{id}/content` | Available with bridge support |
 | Async tasks | `GET /v1/tasks/{id}`, `POST /v1/tasks/{id}/cancel`, `GET /v1/extractions` | Available in the API service |

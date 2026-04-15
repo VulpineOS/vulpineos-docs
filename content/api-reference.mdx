@@ -36,7 +36,9 @@ The health endpoint is public.
 | `GET` | `/health` | No | Service health |
 | `GET` | `/v1/providers` | No | Available LLM providers and models |
 | `POST` | `/v1/extract` | Yes | Extract structured data from one URL |
-| `POST` | `/v1/extract/authenticated` | Yes | Extract from a logged-in page using a stored credential reference |
+| `POST` | `/v1/extract/authenticated` | Yes | Extract from a logged-in page using a stored credential reference and expiring saved sessions |
+| `GET` | `/v1/auth/sessions` | Yes | List saved authenticated browser sessions |
+| `DELETE` | `/v1/auth/sessions/{name}` | Yes | Delete a saved authenticated browser session |
 | `POST` | `/v1/visual` | Yes | Run visual extraction and return labeled screenshot metadata |
 | `POST` | `/v1/batch` | Yes | Queue batch extraction jobs |
 | `GET` | `/v1/audio/captures` | Yes | List active browser audio capture sessions |
@@ -149,6 +151,20 @@ Partial responses keep the same shape with `status: "partial"` and metadata expl
 
 ```http
 POST /v1/extract/authenticated
+```
+
+Named sessions are tenant-scoped. Stale saved sessions expire automatically based on the server-side `AUTH_SESSION_TTL` setting, and authenticated extraction metadata includes whether a stale session was discarded before re-login.
+
+## Saved Auth Sessions
+
+```http
+GET /v1/auth/sessions?q=primary&expired=false
+```
+
+Returns saved browser-session summaries with age, expiry state, and cookie counts. Raw cookie values are never returned.
+
+```http
+DELETE /v1/auth/sessions/{name}
 ```
 
 Use this when the target is behind login and the tenant has a stored credential reference.
