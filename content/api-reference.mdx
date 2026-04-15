@@ -46,6 +46,7 @@ The health endpoint is public.
 | `POST` | `/v1/audio/captures/{id}/transcription/start` | Yes | Start transcription for a capture |
 | `POST` | `/v1/audio/captures/{id}/transcription/stop` | Yes | Stop transcription for a capture |
 | `GET` | `/v1/audio/captures/{id}/transcription/events` | Yes | List transcript events for a capture |
+| `GET` | `/v1/audio/captures/{id}/transcription/stream` | Yes | Stream live transcript updates over SSE |
 | `GET` | `/v1/mobile/devices` | Yes | List Android and iOS devices plus health and registry state visible to the bridge host |
 | `GET` | `/v1/mobile/workers` | Yes | List hosted mobile workers registered with the control plane |
 | `POST` | `/v1/mobile/workers/heartbeat` | Worker token | Register or refresh a hosted mobile worker heartbeat |
@@ -278,6 +279,12 @@ Read transcript events:
 
 ```http
 GET /v1/audio/captures/{id}/transcription/events
+```
+
+Stream live transcript updates with SSE:
+
+```http
+GET /v1/audio/captures/{id}/transcription/stream?since=12
 ```
 
 Stop transcription:
