@@ -314,8 +314,8 @@ POST /v1/mobile/sessions
 The allocator can return local Android sessions with `transport: "cdp_http"`,
 hosted Android worker sessions with `transport: "worker_control"`, or iOS
 sessions with `transport: "webkit_inspector"`. Target creation is available
-on supported Android and iOS sessions. Screen recording currently remains
-limited to local Android `cdp_http` sessions.
+on supported Android and iOS sessions. Android screen recording is available
+for both local `cdp_http` sessions and hosted `worker_control` sessions.
 
 Hosted worker registry data is reconciled before listing or allocation.
 Workers that stop heartbeating move to stale state, attached
