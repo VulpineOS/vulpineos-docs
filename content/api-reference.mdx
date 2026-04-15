@@ -433,11 +433,13 @@ Statuses are `queued`, `running`, `completed`, `failed`, or `canceled`.
 GET /v1/extractions
 ```
 
-Returns recent extraction tasks and metadata for the authenticated tenant. Supports `status`, `monitor_id`, `failure_family`, `retry_class`, and `since_hours` query parameters.
+Returns persisted extraction history for the authenticated tenant across sync extraction, authenticated extraction, visual extraction, and queued async work. Supports `status`, `monitor_id`, `failure_family`, `retry_class`, and `since_hours` query parameters.
 
 Failed rows include both the raw `error` string and a normalized `failure` object with `family`, `retry_class`, `retryable`, and `operator_hint` fields so operators can distinguish immediate retries from configuration or quota issues.
 
 When async retry is active, the same responses also include `attempts`, `async_retries`, and `last_retry_reason` fields so tenant tooling can see whether a task has been retried and why.
+
+History rows also include `mode` so operators can distinguish standard extract, authenticated, and visual runs. Authenticated rows additionally expose `login_trace_id` when a persisted redacted login trace exists.
 
 ## Usage
 
