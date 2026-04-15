@@ -48,7 +48,7 @@ The health endpoint is public.
 | `GET` | `/v1/audio/captures/{id}/transcription/events` | Yes | List transcript events for a capture |
 | `GET` | `/v1/mobile/devices` | Yes | List Android and iOS devices visible to the bridge host |
 | `GET` | `/v1/mobile/devices/{platform}/{id}/targets` | Yes | List inspectable targets for a device |
-| `GET` | `/v1/mobile/sessions` | Yes | List attached mobile sessions |
+| `GET` | `/v1/mobile/sessions` | Yes | List attached and recently finalized mobile session leases |
 | `POST` | `/v1/mobile/sessions` | Yes | Allocate an attached mobile session |
 | `DELETE` | `/v1/mobile/sessions/{id}` | Yes | Release an attached mobile session |
 | `POST` | `/v1/mobile/sessions/{id}/targets` | Yes | Open a new target on a supported session |
@@ -157,6 +157,8 @@ Use this when the target is behind login and the tenant has a stored credential 
 ```
 
 This endpoint requires a paid plan plus private vault/browser wiring.
+
+Mobile session leases are persisted. Session responses may include `expires_at`, `released_at`, and `updated_at`. After an API restart, previously attached worker-local sessions are reconciled to `expired` so stale loopback endpoints are not shown as live sessions.
 
 ## Visual Extract
 
