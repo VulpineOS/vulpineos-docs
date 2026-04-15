@@ -33,12 +33,12 @@ The hosted API is the commercial surface for teams that want VulpineOS capabilit
 |------|-----------|--------|
 | Extraction | `POST /v1/extract`, `POST /v1/extract/authenticated`, `POST /v1/visual`, `POST /v1/batch` | Available in the API service |
 | Audio workflows | `GET /v1/audio/captures`, `POST /v1/audio/captures`, `GET /v1/audio/captures/{id}/chunk`, `POST /v1/audio/captures/{id}/stop`, `POST /v1/audio/captures/{id}/transcription/start`, `POST /v1/audio/captures/{id}/transcription/stop`, `GET /v1/audio/captures/{id}/transcription/events` | Available with paid/private wiring |
-| Mobile workflows | `GET /v1/mobile/devices`, `GET /v1/mobile/devices/{platform}/{id}/targets`, `GET /v1/mobile/sessions`, `POST /v1/mobile/sessions`, `DELETE /v1/mobile/sessions/{id}`, `POST /v1/mobile/sessions/{id}/targets`, `POST /v1/mobile/sessions/{id}/recording/start`, `POST /v1/mobile/sessions/{id}/recording/stop`, `GET /v1/mobile/recordings/{id}/content` | Available with bridge support |
+| Mobile workflows | `GET /v1/mobile/devices`, `GET /v1/mobile/workers`, `POST /v1/mobile/workers/heartbeat`, `GET /v1/mobile/devices/{platform}/{id}/targets`, `GET /v1/mobile/sessions`, `POST /v1/mobile/sessions`, `DELETE /v1/mobile/sessions/{id}`, `POST /v1/mobile/sessions/{id}/targets`, `POST /v1/mobile/sessions/{id}/recording/start`, `POST /v1/mobile/sessions/{id}/recording/stop`, `GET /v1/mobile/recordings/{id}/content` | Available with bridge support |
 | Async tasks | `GET /v1/tasks/{id}`, `POST /v1/tasks/{id}/cancel`, `GET /v1/extractions` | Available in the API service |
 | Recurring monitors | `POST /v1/monitor`, `GET /v1/monitors`, `DELETE /v1/monitors/{id}` | Available in the API service |
 | Account and usage | `GET /v1/usage`, `GET /v1/keys`, `POST /v1/keys`, `GET /v1/providers` | Available in the API service |
 
-Extraction accepts a JSON Schema or natural-language prompt, supports sync and async execution, can opt into pagination, and returns usage metadata such as completeness, token count, retries, and estimated cost. Paid/private surfaces add authenticated extraction, visual extraction, browser audio capture and transcription, and mobile device session controls.
+Extraction accepts a JSON Schema or natural-language prompt, supports sync and async execution, can opt into pagination, and returns usage metadata such as completeness, token count, retries, and estimated cost. Paid/private surfaces add authenticated extraction, visual extraction, browser audio capture and transcription, mobile device session controls, and hosted mobile worker registry visibility.
 
 ## Planned Commercial Products
 

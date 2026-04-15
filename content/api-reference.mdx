@@ -46,7 +46,9 @@ The health endpoint is public.
 | `POST` | `/v1/audio/captures/{id}/transcription/start` | Yes | Start transcription for a capture |
 | `POST` | `/v1/audio/captures/{id}/transcription/stop` | Yes | Stop transcription for a capture |
 | `GET` | `/v1/audio/captures/{id}/transcription/events` | Yes | List transcript events for a capture |
-| `GET` | `/v1/mobile/devices` | Yes | List Android and iOS devices plus health state visible to the bridge host |
+| `GET` | `/v1/mobile/devices` | Yes | List Android and iOS devices plus health and registry state visible to the bridge host |
+| `GET` | `/v1/mobile/workers` | Yes | List hosted mobile workers registered with the control plane |
+| `POST` | `/v1/mobile/workers/heartbeat` | Worker token | Register or refresh a hosted mobile worker heartbeat |
 | `GET` | `/v1/mobile/devices/{platform}/{id}/targets` | Yes | List inspectable targets for a device |
 | `GET` | `/v1/mobile/sessions` | Yes | List attached and recently finalized mobile session leases |
 | `POST` | `/v1/mobile/sessions` | Yes | Allocate an attached mobile session |
@@ -163,6 +165,8 @@ Mobile session leases are persisted. Session responses may include `expires_at`,
 Device inventory responses may also include `health_status`, `failure_streak`, `failed_uses`, and `draining`. Repeated attach or disconnect failures move a device into `draining`, and the session allocator will reject new attaches against draining devices.
 
 Session allocation accepts either an explicit `device_id` or `platform` plus optional `capabilities` and `sticky_key`. Use `sticky_key` when repeated jobs should prefer the same healthy device without exposing a hard-coded device identifier to every caller.
+
+Hosted mobile workers can publish device heartbeats with `POST /v1/mobile/workers/heartbeat` using the internal `X-Vulpine-Worker-Token` header. Inventory rows now also expose `worker_id`, `worker_host`, `worker_addr`, `worker_healthy`, `last_seen_at`, and `registry_state` so remote or stale devices can be identified without attempting a local attach.
 
 ## Visual Extract
 
@@ -286,6 +290,12 @@ List visible devices:
 
 ```http
 GET /v1/mobile/devices
+```
+
+List hosted workers:
+
+```http
+GET /v1/mobile/workers
 ```
 
 Allocate a session:
