@@ -133,6 +133,7 @@ Use pagination when the target spans multiple pages:
 ```
 
 Pagination merges repeated list fields across pages, de-dupes overlapping items, and enriches partial duplicates when a later page adds missing fields for the same entity. `max_pages` lowers the per-request page cap; the service never follows more than five pages total.
+Unsupported extraction option keys are rejected with `400 invalid_request` instead of being silently ignored.
 
 Response shape:
 
