@@ -135,6 +135,7 @@ Use pagination when the target spans multiple pages:
 Pagination merges repeated list fields across pages, de-dupes overlapping items, and enriches partial duplicates when a later page adds missing fields for the same entity, including sparse same-name records with complementary non-conflicting fields. `max_pages` lowers the per-request page cap; the service never follows more than five pages total.
 Unsupported extraction option keys are rejected with `400 invalid_request` instead of being silently ignored.
 Optional schema properties normalize to `null` when a provider omits them or returns blank values, which keeps response shapes stable across reruns and provider variants.
+Set `options.model` when you want a specific extraction model for that request instead of the server default.
 
 Response shape:
 
