@@ -133,6 +133,8 @@ Use pagination when the target spans multiple pages:
 }
 ```
 
+Pagination merges repeated list fields across pages, de-dupes overlapping items, and enriches partial duplicates when a later page adds missing fields for the same entity.
+
 Response shape:
 
 ```json
