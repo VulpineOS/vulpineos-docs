@@ -42,6 +42,7 @@ The health endpoint is public.
 | `DELETE` | `/v1/auth/sessions/{name}` | Yes | Delete a saved authenticated browser session |
 | `GET` | `/v1/auth/traces/{id}` | Yes | Fetch a persisted redacted authenticated login trace |
 | `POST` | `/v1/visual` | Yes | Run visual extraction and return labeled screenshot metadata |
+| `GET` | `/v1/extractions/{id}/result` | Yes | Download the persisted extraction result payload for a historical run |
 | `POST` | `/v1/batch` | Yes | Queue batch extraction jobs |
 | `GET` | `/v1/audio/captures` | Yes | List recent browser audio capture sessions, including completed or interrupted captures with retained artifacts |
 | `POST` | `/v1/audio/captures` | Yes | Start a browser audio capture session |
@@ -463,6 +464,14 @@ GET /v1/extractions/{id}/artifacts/screenshot
 ```
 
 Returns the retained PNG evidence screenshot for that extraction when available.
+
+Download a persisted extraction result:
+
+```http
+GET /v1/extractions/{id}/result
+```
+
+Returns the stored result payload for a completed or partial extraction run as JSON.
 
 Download a retained visual extraction image:
 
