@@ -43,10 +43,11 @@ The health endpoint is public.
 | `GET` | `/v1/auth/traces/{id}` | Yes | Fetch a persisted redacted authenticated login trace |
 | `POST` | `/v1/visual` | Yes | Run visual extraction and return labeled screenshot metadata |
 | `POST` | `/v1/batch` | Yes | Queue batch extraction jobs |
-| `GET` | `/v1/audio/captures` | Yes | List active browser audio capture sessions |
+| `GET` | `/v1/audio/captures` | Yes | List recent browser audio capture sessions, including completed captures with retained artifacts |
 | `POST` | `/v1/audio/captures` | Yes | Start a browser audio capture session |
 | `GET` | `/v1/audio/captures/{id}/chunk` | Yes | Read a base64-encoded audio chunk from a capture |
 | `POST` | `/v1/audio/captures/{id}/stop` | Yes | Stop a browser audio capture session |
+| `GET` | `/v1/audio/captures/{id}/content` | Yes | Download the retained raw audio artifact for a completed capture |
 | `POST` | `/v1/audio/captures/{id}/transcription/start` | Yes | Start transcription for a capture |
 | `POST` | `/v1/audio/captures/{id}/transcription/stop` | Yes | Stop transcription for a capture |
 | `GET` | `/v1/audio/captures/{id}/transcription/events` | Yes | List transcript events for a capture |
@@ -277,6 +278,12 @@ Stop the capture:
 
 ```http
 POST /v1/audio/captures/{id}/stop
+```
+
+Download the retained artifact after stop:
+
+```http
+GET /v1/audio/captures/{id}/content
 ```
 
 These endpoints require a paid plan and private AudioBridge wiring.
