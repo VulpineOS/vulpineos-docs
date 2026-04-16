@@ -454,7 +454,15 @@ Failed rows include both the raw `error` string and a normalized `failure` objec
 
 When async retry is active, the same responses also include `attempts`, `async_retries`, and `last_retry_reason` fields so tenant tooling can see whether a task has been retried and why.
 
-History rows also include `mode` so operators can distinguish standard extract, authenticated, and visual runs. Authenticated rows additionally expose `login_trace_id` when a persisted redacted login trace exists.
+History rows also include `mode` so operators can distinguish standard extract, authenticated, and visual runs. Authenticated rows additionally expose `login_trace_id` when a persisted redacted login trace exists. When browser-backed evidence capture is retained, rows also expose `evidence_screenshot_path` with a tenant-scoped download route.
+
+Download a retained screenshot artifact:
+
+```http
+GET /v1/extractions/{id}/artifacts/screenshot
+```
+
+Returns the retained PNG evidence screenshot for that extraction when available.
 
 ## Usage
 
