@@ -138,6 +138,7 @@ Optional schema properties normalize to `null` when a provider omits them or ret
 Set `options.model` when you want a specific extraction model for that request instead of the server default.
 Set `options.timeout` in seconds when you want to lower the per-request execution ceiling beneath the service default.
 Set `options.waitFor` to a CSS selector, `load`, or `networkIdle` when you need browser-backed extraction to wait for a specific page condition before reading the DOM.
+Set `options.proxy` to an HTTP proxy URL when you want HTTP-fallback extraction to fetch through a specific proxy for that request. `options.proxy` is not used on browser-backed extraction.
 
 Response shape:
 
