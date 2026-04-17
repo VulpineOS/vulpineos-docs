@@ -70,7 +70,7 @@ The health endpoint is public.
 | `GET` | `/v1/mobile/recordings/{id}/content` | Yes | Download a completed mobile recording |
 | `GET` | `/v1/extractions` | Yes | List extraction history |
 | `GET` | `/v1/tasks/{id}` | Yes | Poll an async task |
-| `POST` | `/v1/tasks/{id}/cancel` | Yes | Cancel a queued/running task |
+| `POST` | `/v1/tasks/{id}/cancel` | Yes | Cancel a pending/running task |
 | `GET` | `/v1/usage` | Yes | Current usage and cost metadata |
 | `GET` | `/v1/keys` | Yes | List API keys and their scopes |
 | `POST` | `/v1/keys` | Yes | Create an API key with explicit scopes |
@@ -449,7 +449,7 @@ Task response:
 }
 ```
 
-Statuses are `queued`, `running`, `completed`, `failed`, or `canceled`.
+Statuses are `pending`, `running`, `validating`, `completed`, `partial`, or `failed`.
 
 ## Extraction History
 
@@ -457,7 +457,7 @@ Statuses are `queued`, `running`, `completed`, `failed`, or `canceled`.
 GET /v1/extractions
 ```
 
-Returns persisted extraction history for the authenticated tenant across sync extraction, authenticated extraction, visual extraction, and queued async work. Supports `status`, `monitor_id`, `failure_family`, `retry_class`, and `since_hours` query parameters.
+Returns persisted extraction history for the authenticated tenant across sync extraction, authenticated extraction, visual extraction, and async work. Supports `status`, `monitor_id`, `failure_family`, `retry_class`, and `since_hours` query parameters.
 
 Failed rows include both the raw `error` string and a normalized `failure` object with `family`, `retry_class`, `retryable`, and `operator_hint` fields so operators can distinguish immediate retries from configuration or quota issues.
 
