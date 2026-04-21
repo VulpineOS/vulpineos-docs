@@ -42,7 +42,11 @@ The embedded panel has 12 pages.
 
 ### Dashboard
 
-Live overview: kernel status and PID, active agent count, context pool utilization (active/total/available), total API cost. Telemetry panel shows memory, contexts, pages, and detection risk percentage. Recent events feed updates in real-time via WebSocket.
+Operator overview: browser route, mode, window state, gateway/profile
+readiness, active agent count, pool utilization, spend, and telemetry. The
+dashboard also surfaces quick links into active work, retained runtime alerts,
+recent runtime events, and a compact active-agent preview instead of only a few
+coarse status cards.
 
 ### Agents
 
@@ -154,6 +158,10 @@ Real-time events (telemetry, injection alerts, agent status, runtime audit event
 
 The operator UI now surfaces connecting, reconnecting, and failed websocket
 states inline and retries dropped sessions with exponential backoff.
+
+The panel shell now also groups navigation by operator workflow and keeps live
+runtime context in the sidebar so route, mode, window state, gateway state, and
+active agent count stay visible while moving between pages.
 
 ### Single Binary
 
