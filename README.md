@@ -2,7 +2,9 @@
 
 Documentation site for [VulpineOS](https://github.com/VulpineOS/VulpineOS) — the operating system for AI browser agents.
 
-**Live site:** [vulpineos.com](https://vulpineos.com)
+**Live docs:** [docs.vulpineos.com](https://docs.vulpineos.com)
+
+**Main site:** [vulpineos.com](https://vulpineos.com)
 
 ## Development
 
