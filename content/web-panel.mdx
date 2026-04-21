@@ -38,7 +38,7 @@ Open a remote panel from another machine:
 
 ## Pages
 
-The embedded panel has 11 pages.
+The embedded panel has 12 pages.
 
 ### Dashboard
 
@@ -54,8 +54,12 @@ Five operator views:
 - **Conversation** — Full message history with role-colored entries (user/assistant). Send messages to the agent via text input.
 - **Trace** — Tool calls, result summaries, and detected failed-action warnings.
 - **Raw** — Live OpenClaw session log stream with exact JSONL records.
-- **Recording** — Action timeline showing timestamped browser actions (navigate, click, type, scroll, screenshot).
-- **Fingerprint** — JSON view of the agent's assigned fingerprint (user agent, screen dimensions, WebGL, etc).
+- **Recording** — Action timeline showing timestamped browser actions (navigate, click, type, scroll, screenshot), with JSON export.
+- **Fingerprint** — JSON view of the agent's assigned fingerprint (user agent, screen dimensions, WebGL, etc), with regenerate-and-apply controls.
+
+### Bus
+
+Dedicated operator page for agent-to-agent approvals and communication policies. Review pending delegate/ask traffic, approve or reject individual messages, and define saved auto-approval rules between agent pairs.
 
 ### Contexts
 
@@ -64,6 +68,8 @@ Create and remove browser contexts. Lists active contexts with IDs. Contexts are
 ### Proxies
 
 Import proxies in bulk (one URL per line). Test proxy latency and resolve exit country. Delete individual proxies. Shows URL, status (tested/untested), latency, and country.
+
+The same page also includes a per-agent rotation editor: choose the target agent, select a proxy pool, and persist rotation rules for rate-limit triggers, block triggers, interval-based rotation, and fingerprint sync.
 
 ### Security
 
@@ -95,7 +101,7 @@ the visible address bar after load. Manual login validates the key through
 
 ### Settings
 
-Configure LLM provider, model, and API key (persisted to `~/.vulpineos/config.json`). Resource limits: memory per context (MB), default budget per agent (USD). Kernel info: binary path, auto-restart status, context pool configuration.
+Configure LLM provider, model, and API key (persisted to `~/.vulpineos/config.json`). Persist default agent budgets (USD + token ceiling). Kernel info: binary path, auto-restart status, context pool configuration.
 
 ## API Communication
 
@@ -103,20 +109,21 @@ The panel communicates via WebSocket control messages to the `PanelAPI`
 handler. All messages go through the `/ws` endpoint with access-key
 authentication.
 
-35 control message types across 10 domains, verified against `internal/remote/api.go`:
+44 control message types across 11 domains, verified against `internal/remote/api.go`:
 
 | Domain | Messages |
 |--------|----------|
-| agents | list, spawn, kill, pause, resume, getMessages |
-| config | get, set |
+| agents | list, spawn, kill, pause, pauseMany, resume, resumeMany, killMany, getMessages, getSessionLog |
+| config | get, providers, set |
 | costs | getAll, setBudget, total |
 | webhooks | list, add, remove |
-| proxies | list, add, delete, test, setRotation |
-| bus | pending, approve, reject, policies, addPolicy |
+| proxies | list, add, delete, test, getRotation, setRotation |
+| bus | pending, approve, reject, policies, addPolicy, removePolicy |
 | recording | getTimeline, export |
 | fingerprints | get, generate |
 | status | get |
-| runtime | list |
+| runtime | list, export, setRetention |
+| contexts | list, create, remove |
 
 Example message flow:
 
