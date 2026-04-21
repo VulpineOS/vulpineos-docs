@@ -8,6 +8,8 @@ Documentation site for [VulpineOS](https://github.com/VulpineOS/VulpineOS) — t
 
 ## Development
 
+Use Node 22 LTS for local development. The docs build is clean under Node 22 and currently emits repeated `--localstorage-file` warnings under Node 25.
+
 ```bash
 npm install
 npm run dev

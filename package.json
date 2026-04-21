@@ -13,6 +13,9 @@
     "type": "git",
     "url": "git+https://github.com/VulpineOS/vulpineos-docs.git"
   },
+  "engines": {
+    "node": ">=20.9 <25"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
