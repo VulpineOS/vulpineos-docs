@@ -15,6 +15,14 @@ npm install
 npm run dev
 ```
 
+## Playwright MCP smoke
+
+The repo ships a repo-local smoke script for the local Playwright MCP:
+
+- `scripts/playwright/smoke-docs.js`
+
+Point it at a running docs server with `VULPINE_DOCS_SMOKE_URL` and, if needed, override the screenshot destination with `VULPINE_DOCS_SMOKE_SCREENSHOT`. By default it writes a viewport screenshot to `/tmp/vulpineos-docs-smoke.png`.
+
 ## Stack
 
 - [Next.js](https://nextjs.org) 16
