@@ -1,117 +1,121 @@
 ---
-title: "VulpineOS — AI Browser Agent Operating System for OpenClaw at Scale"
-description: "VulpineOS manages hundreds of AI browser agents on Camoufox with per-agent fingerprints, injection protection, action lock, and token optimization."
+title: "VulpineOS — AI Browser Agent Operating System"
+description: "Stealth-focused browser-agent runtime on Camoufox, with operator controls, remote access, MCP tools, and source-closed commercial surfaces built on the same public stack."
 ---
 
-<div style={{textAlign: 'center', marginBottom: '2rem'}}>
-  <img src="/VulpineOSBanner.png" alt="VulpineOS" style={{maxWidth: '100%', borderRadius: '12px'}} />
+<div style={{ marginBottom: '2rem' }}>
+  <img src="/VulpineOSBanner.png" alt="VulpineOS" style={{ width: '100%', borderRadius: '10px' }} />
 </div>
 
 # VulpineOS
 
-**Operate Stealth and Secure OpenClaw Agents at Scale**
+Operate browser agents on a hardened Firefox runtime with real operator controls, remote access, and a clear split between the open-source stack and the commercial surfaces built on top of it.
 
-VulpineOS is the operating system for AI browser agents — a hardened Firefox fork (based on [Camoufox](https://github.com/daijro/camoufox) / Firefox 146.0.1) for managing hundreds of OpenClaw agents with unique identities, full security, and zero detection. It solves the critical problems that make current browser-based agents fragile and exploitable.
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '12px', margin: '1.5rem 0 2rem' }}>
+  <div style={{ border: '1px solid #26263a', borderRadius: '8px', padding: '14px' }}>
+    <div style={{ fontSize: '12px', color: '#888', marginBottom: '6px' }}>Engine-level guarantees</div>
+    <div style={{ fontWeight: 700 }}>Injection filtering, action lock, optimized DOM export, trust warming</div>
+  </div>
+  <div style={{ border: '1px solid #26263a', borderRadius: '8px', padding: '14px' }}>
+    <div style={{ fontSize: '12px', color: '#888', marginBottom: '6px' }}>Operator surfaces</div>
+    <div style={{ fontWeight: 700 }}>Web panel, TUI workbench, remote control plane, MCP browser tools</div>
+  </div>
+  <div style={{ border: '1px solid #26263a', borderRadius: '8px', padding: '14px' }}>
+    <div style={{ fontSize: '12px', color: '#888', marginBottom: '6px' }}>Commercial line</div>
+    <div style={{ fontWeight: 700 }}>Vulpine API, Vault, AudioBridge, iOS MobileBridge, future fleet products</div>
+  </div>
+</div>
 
-## The Problem
+## What Ships Now
 
-AI agents browsing the web face three unsolved challenges:
+| Surface | What it is |
+|---|---|
+| **VulpineOS** | Public browser-agent runtime on Camoufox with agent orchestration, web panel, TUI, remote server, and MCP tools |
+| **Foxbridge** | Public CDP-to-Firefox bridge for OpenClaw and CDP clients |
+| **Vulpine Mark** | Public set-of-mark labeling for visual browser workflows |
+| **MobileBridge for Android** | Public Android device discovery and session control |
+| **Vulpine API** | Source-closed hosted extraction and browser workflow API |
+| **Vulpine Vault** | Source-closed credential and authenticated-workflow surface |
+| **AudioBridge** | Source-closed browser audio workflow surface |
+| **MobileBridge for iOS** | Source-closed iOS device support |
 
-1. **Prompt Injection** — Malicious websites hide invisible text in the DOM that hijacks the agent's instructions. Current agents have zero defense against this.
+## Why VulpineOS Exists
 
-2. **Page Mutation** — The page changes between when the agent reads it and when it acts. JavaScript timers, animations, and network callbacks mutate the DOM mid-decision, causing the agent to click on elements that no longer exist or have moved.
+Most browser-agent stacks still fail on three basic problems:
 
-3. **Token Waste** — Accessibility trees are bloated with structural noise. Agents burn 50-70% of their context window on wrapper divs, generic groups, and redundant whitespace that carry no semantic value.
+1. Hidden prompt-injection content reaches the model.
+2. The page mutates between read and action.
+3. The model burns too much context on low-value browser structure.
 
-## The Solution
+VulpineOS handles those problems inside the browser/runtime itself:
 
-VulpineOS addresses each problem at the browser engine level — not with JavaScript hacks or post-processing, but with C++ patches to Firefox's core:
+| Layer | Purpose |
+|---|---|
+| [Injection-Proof Filter](/injection-filter) | Removes hidden or non-visible content before it reaches the agent |
+| [Action Lock](/action-lock) | Freezes the page while the agent is deciding |
+| [Optimized DOM Export](/optimized-dom) | Compresses browser state into lower-token semantic output |
+| [Trust Warming](/trust-warming) | Builds stronger browser trust over time for long-lived identities |
 
-| Phase | Feature | Layer |
-|-------|---------|-------|
-| 1 | [Injection-Proof Filter](/injection-filter) | Accessibility tree pruning |
-| 2 | [Action Lock](/action-lock) | C++ page freeze (nsDocShell) |
-| 3 | [Optimized DOM Export](/optimized-dom) | Token-compressed snapshots |
-| 4 | [Trust Warming](/trust-warming) | Background profile warming |
+## Operator Stack
+
+The runtime is not just a browser fork. It ships with the surfaces needed to run agents as an actual system:
+
+| Surface | What it covers |
+|---|---|
+| [Web Panel](/web-panel) | Fleet view, agent sessions, approvals, proxies, contexts, logs, scripts, security, settings |
+| [TUI Workbench](/tui) | SSH-friendly operator view with live conversations, contexts, and browser state |
+| [Remote Access](/remote) | Remote TUI and remote panel control over the same runtime |
+| [MCP Browser Tools](/mcp-tools) | 36 tools for browser control, reliability checks, realism, screenshots, audio, and mobile workflows |
+| [Foxbridge](/foxbridge) | CDP bridge so OpenClaw can drive the same Camoufox runtime |
+
+<div style={{ margin: '2rem 0' }}>
+  <img src="/media/panel-dashboard.png" alt="VulpineOS operator panel" style={{ width: '100%', borderRadius: '10px', border: '1px solid #26263a' }} />
+</div>
+
+## Open Runtime, Commercial Surfaces
+
+The runtime and tool interfaces are public. Some higher-level product surfaces remain source-closed.
+
+| Open source | Source-closed |
+|---|---|
+| VulpineOS runtime | Vulpine API |
+| Foxbridge | Vulpine Vault |
+| Vulpine Mark | AudioBridge |
+| Android MobileBridge | iOS MobileBridge |
+
+The same public MCP and runtime interfaces can be present in both builds. Public builds return clear unavailable responses where a commercial provider is not attached. Commercial builds attach real providers behind the same surface.
+
+See [Source Availability](/source-availability) for the exact boundary and [Vulpine API Features](/api-features) for the hosted commercial surface.
+
+## Roadmap Direction
+
+The next commercial product line currently centers on:
+
+- **Vulpine Sentinel** — fleet stealth health monitoring
+- **Vulpine Replay** — deterministic replay and audit bundles
+- **Vulpine Clockwork** — mid-session identity rotation
+
+The broader roadmap also includes Prism, Pulse, Forge, Scribe, Harbor, Mesh, and Oracle as later commercial products built around the same runtime.
 
 ## Quick Start
 
 ```bash
-# Clone and build
 git clone https://github.com/VulpineOS/VulpineOS.git
 cd VulpineOS
-make fetch && make setup && make dir && make build
-
-# Launch the TUI
+make fetch
+make setup
+make dir
+make build
 ./vulpineos
 ```
 
-On first launch, the setup wizard walks you through selecting an AI provider and model. Each AI browser agent gets its own fingerprint, proxy, and isolated browser context. See [Getting Started](/getting-started) for full instructions.
+Use `./vulpineos panel` for the local operator panel, `./vulpineos tui` for the terminal workbench, and `./vulpineos serve` when you need a remote control plane.
 
-## Platform Features
+## Read Next
 
-Beyond the browser engine security phases, VulpineOS is a complete agent management platform:
-
-| Feature | Description |
-|---------|-------------|
-| [Web Panel](/web-panel) | Browser-based dashboard with 12 pages — manage agents, approvals, proxies, contexts, security, scripts, logs, and settings from anywhere |
-| [TUI Workbench](/tui) | Terminal-based 3-column interface for SSH/server environments |
-| [Agent Scripting DSL](/agent-scripting) | JSON scripting for repetitive browser tasks — zero LLM tokens |
-| [Token Optimization](/token-optimization) | Viewport pruning, result caching, incremental snapshots, batch execution |
-| [Advanced Security](/security-features) | CSP injection, DOM mutation monitoring, 13 injection signatures, sandboxed JS evaluation |
-| [Cost Tracking](/cost-tracking) | Per-agent token usage, USD cost estimation, budget limits with alerts |
-| [Agent Communication](/agent-communication) | Agent-to-agent message bus with approval policies and audit trail |
-| [Foxbridge CDP Proxy](/foxbridge) | Embedded CDP server — OpenClaw controls Camoufox as if it were Chrome |
-| [MCP Browser Tools](/mcp-tools) | 36 tools for browser control, reliability checks, human-like actions, extension surfaces, and Android device bridging |
-| [Vulpine API Features](/api-features) | Public product surface for Vulpine Vault, AudioBridge, MobileBridge, Vulpine Mark, hosted extraction, recurring monitors, and planned commercial products |
-| [Vulpine API Reference](/api-reference) | Endpoint reference for hosted extraction, batch jobs, tasks, monitors, usage, API keys, and providers |
-| [Source Availability](/source-availability) | Which products are open source, which are source-closed, and how commercial features connect to public interfaces |
-| [Launch Checklist](/launch-checklist) | Release checks for docs, source boundaries, API preview, visual review, and Linear handoff |
-| [Remote Access](/remote) | TLS WebSocket server for headless VPS deployment |
-| [Docker](/docker) | One-click container with Vulpine-Box |
-| Per-Agent Fingerprints | BrowserForge pipeline — unique UA, screen, WebGL, canvas/audio seeds per agent |
-| Context Pool | Pre-warm 10 contexts, max 20 concurrent, auto-recycle after 50 uses |
-| Proxy Rotation | Per-agent rotation on rate limit/block, auto-sync fingerprint geo |
-| Session Recording | Record and replay browser action timelines |
-| Persistent Page Cache | Save/restore page state across agent restarts |
-| Webhook Notifications | HTTP webhooks for agent completion, rate limits, injection, budget events |
-| Kernel Watchdog | Auto-restart Camoufox on crash (up to 3 attempts) |
-
-## Architecture
-
-VulpineOS ships as a single Go binary with 37 packages, an embedded web panel, and an embedded foxbridge CDP server — all sharing a single Camoufox instance:
-
-```
-┌─────────────────────────────────────────┐
-│  Web Panel (React, embedded)            │
-│  TUI Workbench (Bubbletea)              │
-├─────────────────────────────────────────┤
-│  Orchestrator · Pool · Vault · MCP      │
-│  AgentBus · CostTracker · Webhooks      │
-│  Recording · PageCache · Security       │
-│  TokenOpt · Scripting · ProxyRotation   │
-├─────────────────────────────────────────┤
-│  Embedded Foxbridge CDP Server (:9222)  │
-│  Juggler Protocol (FD 3/4 pipe)         │
-├─────────────────────────────────────────┤
-│  Camoufox (Firefox 146.0.1)             │
-│  C++ Patches: Action Lock, AX Filter    │
-│  BrowserForge Fingerprints per Context  │
-└─────────────────────────────────────────┘
-```
-
-## Credits
-
-VulpineOS is a personal project by Elliot, forked from [Camoufox](https://github.com/daijro/camoufox) — originally created by [daijro](https://github.com/daijro) and now maintained by [Clover Labs](https://cloverlabs.ai) (where Elliot works and contributed per-context fingerprint spoofing to Camoufox).
-
----
-
-## See also
-
-- [Getting Started](/getting-started) — install and launch your first agent
-- [Architecture](/architecture) — single-process runtime overview
-- [Injection-Proof Filter](/injection-filter) — how VulpineOS blocks prompt injection
-- [MCP Browser Tools](/mcp-tools) — 36 tools for AI agent browser control
-- [Vulpine API Reference](/api-reference) — hosted extraction API endpoints and examples
-- [Foxbridge CDP Proxy](/foxbridge) — embedded CDP server for OpenClaw
-- [Source Availability](/source-availability) — open-source and source-closed product boundaries
+- [Getting Started](/getting-started)
+- [Architecture](/architecture)
+- [Web Panel](/web-panel)
+- [Remote Access](/remote)
+- [Source Availability](/source-availability)
+- [Vulpine API Features](/api-features)
