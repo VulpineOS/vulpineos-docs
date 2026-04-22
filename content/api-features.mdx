@@ -1,95 +1,133 @@
 ---
-title: "Vulpine API Features — Public Products and Source Availability"
-description: "Vulpine API feature surface across open-source VulpineOS components and source-closed commercial extensions."
+title: "Vulpine API — Hosted Browser Extraction and Commercial Surfaces"
+description: "Hosted extraction API built on the VulpineOS runtime, with authenticated workflows, visual extraction, monitors, browser artifacts, and source-closed commercial extensions."
 ---
 
-# Vulpine API Features
+# Vulpine API
 
-Vulpine API packages the VulpineOS browser-agent stack into commercial endpoints. Product names and capabilities are public; source availability depends on whether the component is open infrastructure or a commercial extension.
+Vulpine API is the hosted commercial surface for teams that want browser-backed extraction, authenticated workflows, visual extraction, and recurring monitors without operating their own browser fleet.
 
-## Open Source Components
+<div style={{ margin: '1.5rem 0 2rem' }}>
+  <img src="/media/vulpine-mark-annotated.png" alt="Visual extraction and annotated browser output" style={{ width: '100%', borderRadius: '10px', border: '1px solid #26263a' }} />
+</div>
 
-| Product | Source | API Surface |
-|---------|--------|-------------|
-| VulpineOS | Public | Browser-agent runtime, MCP tools, web panel, TUI, remote server, agent orchestration |
-| Foxbridge | Public | CDP-to-Firefox bridge for OpenClaw, Puppeteer, and CDP clients |
-| Vulpine Mark | Public | Set-of-Mark screenshots, element labels, click/type/hover by label |
-| MobileBridge for Android | Public | Android device discovery, CDP proxying, gestures, and device sessions |
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '12px', margin: '1.5rem 0 2rem' }}>
+  <div style={{ border: '1px solid #26263a', borderRadius: '8px', padding: '14px' }}>
+    <div style={{ fontSize: '12px', color: '#888', marginBottom: '6px' }}>Extraction</div>
+    <div style={{ fontWeight: 700 }}>Structured browser-backed extraction with sync, async, and batch execution</div>
+  </div>
+  <div style={{ border: '1px solid #26263a', borderRadius: '8px', padding: '14px' }}>
+    <div style={{ fontSize: '12px', color: '#888', marginBottom: '6px' }}>Authenticated and visual flows</div>
+    <div style={{ fontWeight: 700 }}>Stored credential workflows, redacted traces, screenshots, annotated image retention</div>
+  </div>
+  <div style={{ border: '1px solid #26263a', borderRadius: '8px', padding: '14px' }}>
+    <div style={{ fontSize: '12px', color: '#888', marginBottom: '6px' }}>Operations</div>
+    <div style={{ fontWeight: 700 }}>Recurring monitors, task history, usage, scoped keys, provider controls, retained artifacts</div>
+  </div>
+</div>
 
-## Commercial Extension Surfaces
+## What Teams Buy
 
-| Product | Source | API Surface |
-|---------|--------|-------------|
-| Vulpine Vault | Source-closed | Credential metadata, autofill, secure input, TOTP, and provider imports |
-| AudioBridge | Source-closed | Browser audio capture sessions, audio chunk streaming, and transcription-oriented workflows |
-| MobileBridge for iOS | Source-closed | iOS device discovery, Web Inspector bridging, and mobile sessions |
-| Vulpine API | Source-closed | Hosted extraction, authenticated and visual workflows, browser audio workflows, mobile sessions, recurring monitors, account operations, billing, and fleet controls |
+| Workflow | What the hosted surface provides |
+|---|---|
+| Structured extraction | Browser-backed extraction from schema or natural-language prompts, with sync and async execution |
+| Authenticated extraction | Stored credential references, expiring saved sessions, and redacted auth traces for diagnosis |
+| Visual extraction | Screenshot-backed extraction plus retained annotated images for later operator review |
+| Monitoring | Repeated runs, change detection, webhook delivery, extraction history, retry/failure classification |
+| Operations | Usage, scoped API keys, provider listing, retained result and artifact downloads |
 
-## Current Vulpine API Endpoints
+## What Is Available Now
 
-The hosted API is the commercial surface for teams that want VulpineOS capabilities without running their own browser fleet. See [Vulpine API Reference](/api-reference) for request and response examples.
+| Area | Current surface |
+|---|---|
+| Extraction | `POST /v1/extract`, `POST /v1/batch`, task lookup, extraction history, result export |
+| Authenticated workflows | `POST /v1/extract/authenticated`, session listing/removal, redacted auth traces |
+| Visual workflows | `POST /v1/visual`, retained screenshot and annotated image downloads |
+| Monitors | Create, list, and delete recurring monitors |
+| Account and usage | Usage totals, provider listing, scoped key creation and listing |
+| Mobile and audio surfaces | Available when the corresponding commercial bridge/capture wiring is attached |
 
-| Area | Endpoints | Status |
-|------|-----------|--------|
-| Extraction | `POST /v1/extract`, `POST /v1/extract/authenticated`, `GET /v1/auth/sessions`, `DELETE /v1/auth/sessions/{name}`, `GET /v1/auth/traces/{id}`, `POST /v1/visual`, `POST /v1/batch` | Available in the API service |
-| Audio workflows | `GET /v1/audio/captures`, `POST /v1/audio/captures`, `GET /v1/audio/captures/{id}/chunk`, `POST /v1/audio/captures/{id}/stop`, `GET /v1/audio/captures/{id}/content`, `POST /v1/audio/captures/{id}/transcription/start`, `POST /v1/audio/captures/{id}/transcription/stop`, `GET /v1/audio/captures/{id}/transcription/events`, `GET /v1/audio/captures/{id}/transcription/content`, `GET /v1/audio/captures/{id}/transcription/stream` | Available with paid/private wiring; capture artifacts survive API restarts until retention cleanup |
-| Mobile workflows | `GET /v1/mobile/devices`, `GET /v1/mobile/workers`, `POST /v1/mobile/workers/heartbeat`, `POST /v1/mobile/workers/{id}/maintenance`, `POST /v1/mobile/devices/{platform}/{id}/maintenance`, `GET /v1/mobile/devices/{platform}/{id}/targets`, `GET /v1/mobile/sessions`, `POST /v1/mobile/sessions`, `DELETE /v1/mobile/sessions/{id}`, `POST /v1/mobile/sessions/{id}/renew`, `POST /v1/mobile/sessions/{id}/targets`, `POST /v1/mobile/sessions/{id}/recording/start`, `POST /v1/mobile/sessions/{id}/recording/stop`, `GET /v1/mobile/recordings/{id}/content` | Available with bridge support |
-| Async tasks | `GET /v1/tasks/{id}`, `POST /v1/tasks/{id}/cancel`, `GET /v1/extractions`, `GET /v1/extractions/{id}/result`, `GET /v1/extractions/{id}/artifacts/screenshot`, `GET /v1/extractions/{id}/artifacts/visual-image` | Available in the API service |
-| Recurring monitors | `POST /v1/monitor`, `GET /v1/monitors`, `DELETE /v1/monitors/{id}` | Available in the API service |
-| Operational alerts | `GET /v1/system/metrics` | Available in the API service, including retention telemetry for auth traces, audio transcripts, mobile recordings, and extraction artifacts |
-| Account and usage | `GET /v1/usage`, `GET /v1/keys`, `POST /v1/keys`, `GET /v1/providers` | Available in the API service, including scoped API keys for admin/read/write/mobile/audio boundaries |
+## Example
 
-Extraction accepts a JSON Schema or natural-language prompt, supports sync and async execution, can opt into pagination, and returns usage metadata such as completeness, token count, retries, and estimated cost. Pagination merges repeated list fields across pages, de-dupes overlapping items, enriches partial duplicates when a later page adds missing fields for the same entity, including sparse same-name records with complementary non-conflicting fields, and honors a lower per-request `max_pages` cap beneath the five-page service ceiling. Optional schema properties normalize to `null` when a provider omits them or returns blank values, which keeps response shapes stable across reruns and provider variants. `options.model` can override the extraction model for one request without changing the server default, `options.timeout` can lower the per-request execution ceiling in seconds, browser-backed `options.waitFor` can wait for `load`, `networkIdle`, or a CSS selector before the DOM snapshot is taken, and HTTP-fallback `options.proxy` can route one request through a specific proxy without changing the service-wide browser path. Unknown extraction option keys and incompatible option combinations are rejected with `400 invalid_request`; `options.waitFor` requires browser-backed extraction and `options.proxy` requires HTTP fallback extraction. Write endpoints also use strict JSON decoding, so unknown fields or trailing JSON content return `400 invalid_request`. Failed async tasks and extraction-history rows also carry normalized failure classification for retry automation and operator diagnosis, plus queue-level attempt metadata when transient retries are used. Extraction history can be filtered by status, monitor, failure family, retry class, and recent time window, and now exposes cache-hit state plus run duration and sync retry counts for operator triage. Completed runs can also export their persisted result payload through `GET /v1/extractions/{id}/result`. Browser-backed extraction runs can retain an evidence screenshot and expose its tenant-scoped `evidence_screenshot_path` download route in task and extraction metadata. Visual extraction runs can additionally retain their annotated PNG and expose a tenant-scoped `visual_image_path` download route for later operator review. Paid/private surfaces add authenticated extraction, persisted redacted login traces for authenticated failures and relogins, visual extraction, browser audio capture and transcription, mobile device session controls, and hosted mobile worker registry visibility.
+```bash
+curl -X POST https://api.vulpineos.com/v1/extract \
+  -H "Authorization: Bearer $VULPINE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com/products",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "products": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "price": { "type": "number" }
+            }
+          }
+        }
+      }
+    }
+  }'
+```
 
-## Planned Commercial Products
+## Why the Hosted Surface Exists
 
-These product names are public roadmap language. Their source code and implementation details are source-closed unless a row explicitly says otherwise.
+VulpineOS itself is public and self-hostable. The hosted API exists for teams that want:
 
-| Product | Source | What It Is |
-|---------|--------|------------|
-| Vulpine Sentinel | Source-closed | Stealth health monitoring for browser-agent fleets, with per-session risk scoring and alerting |
-| Vulpine Replay | Mixed | Deterministic browser replay for debugging and audit trails; the bundle format may be public, while high-fidelity recording remains commercial |
-| Vulpine Clockwork | Source-closed | Mid-session identity rotation for long-running browser sessions without discarding session state |
-| Vulpine Prism | Source-closed | Controlled handling of third-party detection and tracker behavior for managed fleet environments |
-| Vulpine Pulse | Source-closed | Engine-level human behavior modeling for clicks, typing, scrolling, and dwell timing |
-| Vulpine Forge | Source-closed with possible public adapters | Automation surface for complex WebAssembly-heavy web apps |
-| Vulpine Scribe | Mixed | Deep network trace format and runtime request diagnostics; trace formats may be public, capture implementation remains commercial |
-| Vulpine Harbor | Source-closed | Per-citizen virtual file workspace for downloads, uploads, file forms, and document handling |
-| Vulpine Mesh | Source-closed | High-throughput browser-to-agent data transport for screenshots, audio, replay frames, and large snapshots |
-| Vulpine Oracle | Source-closed | JavaScript execution recording and analysis for deterministic debugging and agent reliability |
+- browser-backed extraction without running the browser fleet
+- authenticated and visual workflows behind a stable service boundary
+- retained artifacts and history for operators
+- commercial extensions such as Vault, AudioBridge, and iOS MobileBridge behind the same product line
 
-## Planned API Feature Families
+## Open Runtime, Commercial Surface
 
-These are candidate hosted API surfaces that build on the open-source runtime plus commercial extensions:
+| Open source foundation | Hosted / source-closed surface |
+|---|---|
+| VulpineOS runtime | Vulpine API |
+| Foxbridge | Vulpine Vault |
+| Vulpine Mark | AudioBridge |
+| Android MobileBridge | iOS MobileBridge |
 
-| API Feature | Depends On | Public Description |
-|-------------|------------|--------------------|
-| Authenticated extraction | Vulpine Vault | Run extraction behind login flows using stored credentials and audit-friendly autofill |
-| Visual extraction | Vulpine Mark | Return labeled screenshots and element tables for VLM and computer-use workflows |
-| Browser audio workflows | AudioBridge | Capture tab audio for transcripts, audio challenge handling, and voice-based pages |
-| Mobile extraction | MobileBridge | Extract from Android browsers today, with source-closed iOS support planned for managed environments |
-| Protected crawl | Vulpine Vault, Vulpine Mark | Crawl authenticated sites with session refresh, change detection, and per-page audit trails |
-| Recurring monitors | Vulpine API | Schedule repeated extractions and receive webhook updates when monitored data changes |
+The hosted API uses the same runtime family, but some higher-level product surfaces stay source-closed. Public docs name them and describe their capability boundaries, while implementation details stay out of the public repos.
 
-## MCP Mapping
+## Commercial Product Line
 
-The public MCP surface exposes stable tool names so clients can integrate once:
+| Product | Status | Public description |
+|---|---|---|
+| Vulpine API | Current | Hosted extraction, authenticated and visual workflows, monitors, usage, keys, and operations |
+| Vulpine Vault | Current commercial extension | Credential metadata, secure autofill, TOTP, and authenticated workflow support |
+| AudioBridge | Current commercial extension | Browser audio capture and transcription-oriented workflows |
+| MobileBridge for iOS | Current commercial extension | iOS device discovery and session support for managed environments |
+| Vulpine Sentinel | Roadmap | Fleet stealth health monitoring |
+| Vulpine Replay | Roadmap | Deterministic replay and audit bundles |
+| Vulpine Clockwork | Roadmap | Mid-session identity rotation |
 
-| Capability | Tools |
-|------------|-------|
-| Set-of-Mark | `vulpine_annotated_screenshot`, `vulpine_click_label` |
-| Vulpine Vault | `vulpine_get_credential`, `vulpine_autofill` |
-| AudioBridge | `vulpine_start_audio_capture`, `vulpine_stop_audio_capture`, `vulpine_read_audio_chunk` |
-| MobileBridge | `vulpine_list_mobile_devices`, `vulpine_connect_mobile_device`, `vulpine_disconnect_mobile_device` |
+## Product Boundary
 
-Open-source builds return clear unavailable errors for commercial extension surfaces when no provider is attached. Commercial builds can enable the same public tool names without changing client code.
+The public/open pieces are:
 
----
+- VulpineOS runtime
+- Foxbridge
+- Vulpine Mark
+- Android MobileBridge
+- public docs and API positioning
 
-## See also
+The source-closed pieces are:
 
-- [MCP Browser Tools](/mcp-tools) — 36 tools for AI agent browser control
-- [Vulpine API Reference](/api-reference) — endpoint reference for hosted extraction and account APIs
-- [Source Availability](/source-availability) — open-source and source-closed product boundaries
-- [Foxbridge CDP Proxy](/foxbridge) — embedded CDP server for OpenClaw
-- [Docker Deployment](/docker) — Vulpine-Box server deployment
+- Vulpine API service implementation
+- Vault
+- AudioBridge
+- iOS MobileBridge
+- planned commercial products such as Sentinel, Replay, Clockwork, Prism, Pulse, Forge, Scribe, Harbor, Mesh, and Oracle
+
+See [Source Availability](/source-availability) for the exact boundary and [API Reference](/api-reference) for the endpoint-level contract.
+
+## Read Next
+
+- [API Reference](/api-reference)
+- [Source Availability](/source-availability)
+- [MCP Browser Tools](/mcp-tools)
+- [Web Panel](/web-panel)
