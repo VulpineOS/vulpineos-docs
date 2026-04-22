@@ -8,7 +8,11 @@ Documentation site for [VulpineOS](https://github.com/VulpineOS/VulpineOS) — t
 
 ## Development
 
-Use Node 22 LTS for local development. The docs build is clean under Node 22 and currently emits repeated `--localstorage-file` warnings under Node 25.
+Use Node 22 LTS for local development. The repo pins `.nvmrc` to `22` and
+`package.json` engines to `<25`. The docs build is clean under Node 22. Under
+Node 25, even a clean-environment `npm run build` currently emits repeated
+`--localstorage-file` warnings from the Next/Turbopack toolchain rather than
+from tracked repo config.
 
 ```bash
 npm install
