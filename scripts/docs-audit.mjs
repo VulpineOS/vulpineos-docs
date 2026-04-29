@@ -28,7 +28,7 @@ function command(cmd, args, cwd = root) {
 
 const failures = []
 const mdxPages = walk('content', '.mdx')
-const packageCount = command('go', ['list', './...'], vulpineosRoot).split('\n').filter(Boolean).length
+const packageCount = command('go', ['list', './cmd/...', './internal/...'], vulpineosRoot).split('\n').filter(Boolean).length
 const mcpSource = [
   readFileSync(join(vulpineosRoot, 'internal/mcp/tools.go'), 'utf8'),
   readFileSync(join(vulpineosRoot, 'internal/mcp/extension_tools.go'), 'utf8'),

@@ -2,7 +2,7 @@
 
 > Operate Stealth and Secure OpenClaw Agents at Scale
 
-VulpineOS is the operating system for AI browser agents. Built on Camoufox (a hardened Firefox 146.0.1 fork originally created by daijro), it manages hundreds of OpenClaw agents with unique identities, full security, and zero detection. VulpineOS ships as a single Go binary with 39 packages, an embedded web panel, an embedded foxbridge CDP server, and a terminal-based TUI — all sharing a single Camoufox browser process.
+VulpineOS is the operating system for AI browser agents. Built on Camoufox (a hardened Firefox 146.0.1 fork originally created by daijro), it manages hundreds of OpenClaw agents with unique identities, full security, and zero detection. VulpineOS ships as a single Go binary with 38 packages, an embedded web panel, an embedded foxbridge CDP server, and a terminal-based TUI — all sharing a single Camoufox browser process.
 
 - Documentation: https://docs.vulpineos.com
 - Repository: https://github.com/VulpineOS/VulpineOS
@@ -288,7 +288,7 @@ Web Panel (React, embedded) / TUI (Bubbletea)
 ### Juggler Protocol
 JSON-RPC layer over pipe (FD 3 read, FD 4 write) with null-byte delimited frames. Key domains: Browser (context management, telemetry, trust warming, cookies), Page (navigation, snapshots, action lock, AX tree, optimized DOM).
 
-### Go Runtime (39 Packages)
+### Go Runtime (38 Packages)
 
 - **Kernel** (`internal/kernel/`): Start/Stop/Wait, spawns Firefox with pipe FDs, auto-detects binary. Watchdog monitors every 2s, auto-restarts on crash (up to 3 attempts).
 - **Juggler Transport** (`internal/juggler/`): PipeTransport with FD 3/4, Client with Call() (sync RPC) + Subscribe() (event handlers).
@@ -384,7 +384,7 @@ JSON structured logger with levels (Debug/Info/Warn/Error), component tags, fiel
 
 ## Testing
 
-495+ Go tests across 39 packages, all passing with race detector. 48 web panel control messages. 12 web panel pages. Full OpenClaw integration tested end-to-end. Foxbridge: 379 Go unit tests.
+500+ Go tests across 38 packages, all passing with race detector. 48 web panel control messages. 12 web panel pages. Full OpenClaw integration tested end-to-end. Foxbridge: 379 Go unit tests.
 
 ---
 
