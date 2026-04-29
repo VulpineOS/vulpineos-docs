@@ -26,7 +26,7 @@ and removes it from the visible address bar.
 Networked serve mode:
 
 ```bash
-./vulpineos serve --host 0.0.0.0 --port 8443 --api-key $VULPINE_API_KEY
+./vulpineos serve --host 0.0.0.0 --port 8443 --no-tls --api-key $VULPINE_API_KEY
 ```
 
 If `--api-key` is omitted in serve mode, VulpineOS generates one at startup and
@@ -35,7 +35,7 @@ prints both the access key and a direct panel URL containing the token.
 Open a remote panel from another machine:
 
 ```bash
-./vulpineos remote --url https://your-server:8443 --api-key $VULPINE_API_KEY
+./vulpineos remote --url http://your-server:8443 --api-key $VULPINE_API_KEY
 ```
 
 ## Pages
@@ -123,7 +123,7 @@ The panel communicates via WebSocket control messages to the `PanelAPI`
 handler. All messages go through the `/ws` endpoint with access-key
 authentication.
 
-48 control message types across 14 domains, verified against `internal/remote/api.go`:
+46 control message types across 14 domains, verified against `internal/remote/api.go`:
 
 | Domain       | Messages                                                                                      |
 | ------------ | --------------------------------------------------------------------------------------------- |

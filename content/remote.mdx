@@ -26,7 +26,7 @@ TUI and kernel on the same machine. No network involved.
 Expose the runtime, web panel, and control API over the network:
 
 ```bash
-./vulpineos serve --host 0.0.0.0 --port 8443 --api-key YOUR_SECRET_KEY
+./vulpineos serve --host 0.0.0.0 --port 8443 --no-tls --api-key YOUR_SECRET_KEY
 ```
 
 This starts:
@@ -44,9 +44,9 @@ the access key and a direct panel URL containing the token.
 Open the remote panel in your local browser:
 
 ```bash
-./vulpineos remote --url https://your-vps:8443 --api-key YOUR_SECRET_KEY
+./vulpineos remote --url http://your-vps:8443 --api-key YOUR_SECRET_KEY
 # or explicitly:
-./vulpineos remote panel --url https://your-vps:8443 --api-key YOUR_SECRET_KEY
+./vulpineos remote panel --url http://your-vps:8443 --api-key YOUR_SECRET_KEY
 ```
 
 If you omit the explicit remote mode, `panel` is the default.
@@ -56,7 +56,7 @@ If you omit the explicit remote mode, `panel` is the default.
 Connect the terminal workbench to a remote runtime:
 
 ```bash
-./vulpineos remote tui --url https://your-vps:8443 --api-key YOUR_SECRET_KEY
+./vulpineos remote tui --url http://your-vps:8443 --api-key YOUR_SECRET_KEY
 ```
 
 The TUI behaves identically to local mode — all panels, keybinds, and agent
@@ -91,7 +91,7 @@ changes) are automatically broadcast to all connected clients.
 ## Health Check
 
 ```bash
-curl https://your-vps:8443/health
+curl http://your-vps:8443/health
 # → {"status": "ok", "uptime": 3600, "contexts": 5}
 ```
 
@@ -104,7 +104,7 @@ curl https://your-vps:8443/health
 
 ## Security Considerations
 
-- Always use `wss://` / `https://` (TLS) in production
+- Use `--no-tls` only behind a trusted network or reverse proxy; use `wss://` / `https://` (TLS) in production
 - Provide a strong explicit access key when you need a stable credential
 - Panel access keys are stored only for the current browser session
 - The server does not expose the kernel binary or filesystem — only Juggler protocol access

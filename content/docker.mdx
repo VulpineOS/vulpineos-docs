@@ -12,7 +12,7 @@ your laptop through the web panel or the TUI.
 By default the container starts:
 
 ```bash
-./vulpineos serve --binary ./browser/camoufox --port 8443 --api-key "$VULPINE_API_KEY"
+./vulpineos serve --binary ./browser/camoufox --port 8443 --no-tls --api-key "$VULPINE_API_KEY"
 ```
 
 That means the stock Docker path exposes the same served control plane as a normal
@@ -80,7 +80,7 @@ services:
     ports:
       - "8443:8443"
     environment:
-      - VULPINE_API_KEY=${VULPINE_API_KEY:-changeme}
+      - VULPINE_API_KEY=${VULPINE_API_KEY:?set VULPINE_API_KEY to a random access key before running docker compose}
     volumes:
       - vulpineos-data:/root/.vulpineos
       - vulpine-profiles:/opt/vulpineos/profiles
@@ -139,9 +139,9 @@ entrypoint.
 The `scripts/entrypoint.sh` script:
 
 1. Starts Xvfb on display `:99`
-2. Launches `vulpineos serve --binary ./browser/camoufox --port 8443`
+2. Launches `vulpineos serve --binary ./browser/camoufox --port 8443 --no-tls`
 3. Adds `--api-key "$VULPINE_API_KEY"` when that environment variable is set
-4. Adds `--tls-cert` and `--tls-key` when both TLS environment variables are set
+4. Replaces `--no-tls` with `--tls-cert` and `--tls-key` when both TLS environment variables are set
 
 The panel does not have a separate login database. The prompt in the remote panel is asking
 for the same access key passed in as `VULPINE_API_KEY`.
@@ -173,7 +173,7 @@ Then pass the matching environment variables:
 
 ```yaml
 environment:
-  - VULPINE_API_KEY=${VULPINE_API_KEY:-changeme}
+  - VULPINE_API_KEY=${VULPINE_API_KEY:?set VULPINE_API_KEY to a random access key before running docker compose}
   - VULPINE_TLS_CERT=/etc/vulpineos/cert.pem
   - VULPINE_TLS_KEY=/etc/vulpineos/key.pem
 ```
@@ -189,8 +189,8 @@ Once TLS is enabled:
 - The image depends on a prebuilt Linux Camoufox distribution; the Docker build does not
   produce one for you.
 - The stock compose file does not include TLS certificates.
-- The default access key in `docker-compose.yml` is only a placeholder; replace it before
-  exposing the service on a network.
+- `docker-compose.yml` requires `VULPINE_API_KEY`; generate one before launching the
+  service on a network.
 - Browser rendering happens under Xvfb, so direct desktop inspection is not part of this
   deployment mode.
 

@@ -41,12 +41,13 @@ npm install
 ```bash
 git clone https://github.com/VulpineOS/VulpineOS.git
 cd VulpineOS
+export VULPINE_API_KEY=$(openssl rand -hex 32)
 docker compose up -d
 ```
 
 Then connect from any machine:
 ```bash
-vulpineos remote tui --url https://your-server:8443 --api-key YOUR_KEY
+vulpineos remote tui --url http://your-server:8443 --api-key $VULPINE_API_KEY
 ```
 
 ## First Run
@@ -120,7 +121,7 @@ This runs the full interface with simulated data — useful for testing layouts 
 Expose a server with the web panel and remote control API:
 
 ```bash
-./vulpineos serve --host 0.0.0.0 --port 8443
+./vulpineos serve --host 0.0.0.0 --port 8443 --no-tls
 ```
 
 If `--api-key` is omitted, VulpineOS generates one at startup and prints both
@@ -129,15 +130,15 @@ the access key and a direct panel URL containing the token.
 Open a remote panel from another machine:
 
 ```bash
-./vulpineos remote --url https://your-server:8443 --api-key YOUR_KEY
+./vulpineos remote --url http://your-server:8443 --api-key YOUR_KEY
 # or explicitly:
-./vulpineos remote panel --url https://your-server:8443 --api-key YOUR_KEY
+./vulpineos remote panel --url http://your-server:8443 --api-key YOUR_KEY
 ```
 
 Connect the remote TUI:
 
 ```bash
-./vulpineos remote tui --url https://your-server:8443 --api-key YOUR_KEY
+./vulpineos remote tui --url http://your-server:8443 --api-key YOUR_KEY
 ```
 
 ## Next Steps

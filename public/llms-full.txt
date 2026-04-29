@@ -296,7 +296,7 @@ JSON-RPC layer over pipe (FD 3 read, FD 4 write) with null-byte delimited frames
 - **Identity Vault** (`internal/vault/`): SQLite (WAL mode + foreign keys). Schema: citizens, citizen_cookies, citizen_storage, templates, nomad_sessions, agents, agent_messages, proxies. Persistent identities with cookies, localStorage, fingerprint seeds. Templates for reusable SOPs. Ephemeral nomad sessions.
 - **Orchestrator** (`internal/orchestrator/`): SpawnCitizen() loads identity + cookies, acquires context, applies fingerprint, spawns agent. SpawnNomad() creates ephemeral session. Auto-releases context slots on completion.
 - **OpenClaw Manager** (`internal/openclaw/`): Spawn/kill agents, status channel, auto-cleanup. SpawnWithSession/ResumeWithSession for persistent named sessions. SOP file injection. 30 providers supported (Anthropic, OpenAI, Google, xAI, Ollama, OpenRouter, Groq, Mistral, Together, Cerebras, etc.).
-- **Remote** (`internal/remote/`): HTTP/WS server with /ws and /health endpoints. WS client implementing juggler.Transport. API key auth (constant-time compare). Web panel: 48 control messages. Primary modes: local TUI, local panel, served panel/API, remote panel/TUI, and stdio MCP.
+- **Remote** (`internal/remote/`): HTTP/WS server with /ws and /health endpoints. WS client implementing juggler.Transport. API key auth (constant-time compare). Web panel: 46 control messages. Primary modes: local TUI, local panel, served panel/API, remote panel/TUI, and stdio MCP.
 - **Proxy System** (`internal/proxy/`): ParseProxyURL, ParseProxyList (bulk import), ResolveGeo (ip-api.com), TestProxy (latency). SyncFingerprintToProxy injects geolocation, timezone, WebRTC IP, locale (32 countries). Auto-rotation on rate limit/IP block/time interval.
 - **Monitor** (`internal/monitor/`): Pattern-based scanning of agent output for 429/rate limit, captcha/challenge, blocked/forbidden. Per-agent failure tracking, requires 2+ hits to avoid false positives.
 - **Fingerprint System**: Two-tier — (1) Full Camoufox pipeline via Python subprocess (BrowserForge Bayesian network + WebGL DB with 147 GL params + OS-matched fonts), (2) Fallback with OS-consistent profiles. Locked to host OS.
@@ -322,7 +322,7 @@ Agent lifecycle: CREATE -> ACTIVE -> PAUSED -> ACTIVE -> COMPLETED/FAILED. Conve
 
 React SPA (Vite) embedded in Go binary via go:embed. 12 pages: Dashboard, Agents, AgentDetail, Bus, Contexts, Proxies, Security, Webhooks, Scripts, Settings, Logs, Login.
 
-48 control messages across 14 domains: agents, config, costs, webhooks, proxies, bus, recording, fingerprints, scripts, security, status, sentinel availability, runtime audit, and contexts.
+46 control messages across 14 domains: agents, config, costs, webhooks, proxies, bus, recording, fingerprints, scripts, security, status, sentinel availability, runtime audit, and contexts.
 
 Communication via WebSocket control messages. Real-time events (telemetry, injection alerts, agent status) broadcast to all connected clients.
 
@@ -332,8 +332,8 @@ Communication via WebSocket control messages. Real-time events (telemetry, injec
 
 Three modes:
 1. **Local** — TUI + kernel on same machine (default)
-2. **Server** — `vulpineos serve --port 8443 --api-key KEY` exposes the panel and WebSocket endpoint
-3. **Client** — `vulpineos remote [panel|tui] --url https://host:8443 --api-key KEY` connects to a remote kernel
+2. **Server** — `vulpineos serve --port 8443 --no-tls --api-key KEY` exposes the panel and WebSocket endpoint over HTTP/WS
+3. **Client** — `vulpineos remote [panel|tui] --url http://host:8443 --api-key KEY` connects to a remote kernel
 
 WebSocket multiplexes: juggler messages (bidirectional), control commands (client->server), TUI state updates (server->client). API key auth via Bearer header or query param with constant-time comparison. Health check at /health.
 
@@ -341,7 +341,7 @@ WebSocket multiplexes: juggler messages (bidirectional), control commands (clien
 
 ## Docker (Vulpine-Box)
 
-One-click container: `docker compose up -d`. Multi-stage build: Go binary (CGO_ENABLED=0, stripped) + Ubuntu 22.04 + GTK/X11 + Xvfb + Camoufox + Node.js/OpenClaw.
+Container launch: set `VULPINE_API_KEY`, then run `docker compose up -d`. Multi-stage build: Go binary (CGO_ENABLED=0, stripped) + Ubuntu 22.04 + GTK/X11 + Xvfb + Camoufox + Node.js/OpenClaw. The stock compose path serves plain HTTP on port 8443 unless TLS certificate paths are provided.
 
 Persistent volumes: vulpineos-data (/root/.vulpineos for SQLite vault, agents, config), vulpine-profiles (/opt/vulpineos/profiles for browser profiles/cache). 4GB memory limit (supports 20-30 concurrent contexts). TLS via mounted certificates.
 
@@ -384,7 +384,7 @@ JSON structured logger with levels (Debug/Info/Warn/Error), component tags, fiel
 
 ## Testing
 
-500+ Go tests across 38 packages, all passing with race detector. 48 web panel control messages. 12 web panel pages. Full OpenClaw integration tested end-to-end. Foxbridge: 285+ Go unit tests.
+500+ Go tests across 38 packages, all passing with race detector. 46 web panel control messages. 12 web panel pages. Full OpenClaw integration tested end-to-end. Foxbridge: 285+ Go unit tests.
 
 ---
 
@@ -406,7 +406,7 @@ Yes — foxbridge provides full CDP support via Juggler and WebDriver BiDi. 13 C
 VulpineOS strips hidden DOM nodes (display:none, opacity:0, off-screen, clip-path) from the accessibility tree at the C++ level before the AI reads the page.
 
 **How do I deploy VulpineOS on a VPS?**
-Use Docker (Vulpine-Box): `docker compose up -d`, then connect from your laptop with `vulpineos remote panel --url https://your-vps:8443 --api-key KEY`.
+Use Docker (Vulpine-Box): set `VULPINE_API_KEY`, run `docker compose up -d`, then connect from your laptop with `vulpineos remote panel --url http://your-vps:8443 --api-key KEY`.
 
 **How do I track agent costs?**
 VulpineOS tracks per-agent token usage and estimates USD cost using built-in pricing for major models. Set budget limits to auto-pause agents that exceed spending caps.
