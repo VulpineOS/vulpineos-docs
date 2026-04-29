@@ -2,7 +2,7 @@
 
 > Operate Stealth and Secure OpenClaw Agents at Scale
 
-VulpineOS is the operating system for AI browser agents. Built on Camoufox (a hardened Firefox 146.0.1 fork originally created by daijro), it manages hundreds of OpenClaw agents with unique identities, full security, and zero detection. VulpineOS ships as a single Go binary with 37 packages, an embedded web panel, an embedded foxbridge CDP server, and a terminal-based TUI — all sharing a single Camoufox browser process.
+VulpineOS is the operating system for AI browser agents. Built on Camoufox (a hardened Firefox 146.0.1 fork originally created by daijro), it manages hundreds of OpenClaw agents with unique identities, full security, and zero detection. VulpineOS ships as a single Go binary with 39 packages, an embedded web panel, an embedded foxbridge CDP server, and a terminal-based TUI — all sharing a single Camoufox browser process.
 
 - Documentation: https://docs.vulpineos.com
 - Repository: https://github.com/VulpineOS/VulpineOS
@@ -171,7 +171,7 @@ Files: `internal/tokenopt/viewport.go`, `internal/tokenopt/cache.go`, `internal/
 
 ## MCP Tools (36 Tools)
 
-VulpineOS provides a Model Context Protocol server (`./vulpineos --mcp-server`) exposing browser automation, reliability checks, human-like actions, and extension surfaces as tool calls:
+VulpineOS provides a Model Context Protocol server (`./vulpineos mcp`) exposing browser automation, reliability checks, human-like actions, and extension surfaces as tool calls:
 
 Core browser controls: vulpine_navigate, vulpine_snapshot, vulpine_click, vulpine_type, vulpine_screenshot, vulpine_scroll, vulpine_new_context, vulpine_close_context, vulpine_get_ax_tree, vulpine_click_ref, vulpine_type_ref, vulpine_hover_ref.
 
@@ -288,15 +288,15 @@ Web Panel (React, embedded) / TUI (Bubbletea)
 ### Juggler Protocol
 JSON-RPC layer over pipe (FD 3 read, FD 4 write) with null-byte delimited frames. Key domains: Browser (context management, telemetry, trust warming, cookies), Page (navigation, snapshots, action lock, AX tree, optimized DOM).
 
-### Go Runtime (22 Packages)
+### Go Runtime (39 Packages)
 
 - **Kernel** (`internal/kernel/`): Start/Stop/Wait, spawns Firefox with pipe FDs, auto-detects binary. Watchdog monitors every 2s, auto-restarts on crash (up to 3 attempts).
 - **Juggler Transport** (`internal/juggler/`): PipeTransport with FD 3/4, Client with Call() (sync RPC) + Subscribe() (event handlers).
 - **Context Pool** (`internal/pool/`): Pre-warm 10 contexts, max 20 concurrent, recycle after 50 uses, configurable memory limits per context.
 - **Identity Vault** (`internal/vault/`): SQLite (WAL mode + foreign keys). Schema: citizens, citizen_cookies, citizen_storage, templates, nomad_sessions, agents, agent_messages, proxies. Persistent identities with cookies, localStorage, fingerprint seeds. Templates for reusable SOPs. Ephemeral nomad sessions.
 - **Orchestrator** (`internal/orchestrator/`): SpawnCitizen() loads identity + cookies, acquires context, applies fingerprint, spawns agent. SpawnNomad() creates ephemeral session. Auto-releases context slots on completion.
-- **OpenClaw Manager** (`internal/openclaw/`): Spawn/kill agents, status channel, auto-cleanup. SpawnWithSession/ResumeWithSession for persistent named sessions. SOP file injection. 31 providers supported (Anthropic, OpenAI, Google, xAI, Ollama, OpenRouter, Groq, Mistral, Together, Cerebras, etc.).
-- **Remote** (`internal/remote/`): HTTP/WS server with /ws and /health endpoints. WS client implementing juggler.Transport. API key auth (constant-time compare). Web panel: 29 API endpoints. Three modes: local, server (--serve), client (--remote).
+- **OpenClaw Manager** (`internal/openclaw/`): Spawn/kill agents, status channel, auto-cleanup. SpawnWithSession/ResumeWithSession for persistent named sessions. SOP file injection. 30 providers supported (Anthropic, OpenAI, Google, xAI, Ollama, OpenRouter, Groq, Mistral, Together, Cerebras, etc.).
+- **Remote** (`internal/remote/`): HTTP/WS server with /ws and /health endpoints. WS client implementing juggler.Transport. API key auth (constant-time compare). Web panel: 48 control messages. Primary modes: local TUI, local panel, served panel/API, remote panel/TUI, and stdio MCP.
 - **Proxy System** (`internal/proxy/`): ParseProxyURL, ParseProxyList (bulk import), ResolveGeo (ip-api.com), TestProxy (latency). SyncFingerprintToProxy injects geolocation, timezone, WebRTC IP, locale (32 countries). Auto-rotation on rate limit/IP block/time interval.
 - **Monitor** (`internal/monitor/`): Pattern-based scanning of agent output for 429/rate limit, captcha/challenge, blocked/forbidden. Per-agent failure tracking, requires 2+ hits to avoid false positives.
 - **Fingerprint System**: Two-tier — (1) Full Camoufox pipeline via Python subprocess (BrowserForge Bayesian network + WebGL DB with 147 GL params + OS-matched fonts), (2) Fallback with OS-consistent profiles. Locked to host OS.
@@ -320,9 +320,9 @@ Agent lifecycle: CREATE -> ACTIVE -> PAUSED -> ACTIVE -> COMPLETED/FAILED. Conve
 
 ## Web Panel
 
-React SPA (Vite) embedded in Go binary via go:embed. 11 pages: Dashboard, Agents, AgentDetail, Contexts, Proxies, Security, Webhooks, Scripts, Settings, Logs, Login.
+React SPA (Vite) embedded in Go binary via go:embed. 12 pages: Dashboard, Agents, AgentDetail, Bus, Contexts, Proxies, Security, Webhooks, Scripts, Settings, Logs, Login.
 
-29 API endpoints across 9 domains: agents (list/spawn/kill/pause/resume/messages), config (get/set), costs (getAll/setBudget/total), webhooks (list/add/remove), proxies (list/add/delete/test/setRotation), bus (pending/approve/reject/policies/addPolicy), recording (getTimeline/export), fingerprints (get/generate), status (get).
+48 control messages across 14 domains: agents, config, costs, webhooks, proxies, bus, recording, fingerprints, scripts, security, status, sentinel availability, runtime audit, and contexts.
 
 Communication via WebSocket control messages. Real-time events (telemetry, injection alerts, agent status) broadcast to all connected clients.
 
@@ -332,8 +332,8 @@ Communication via WebSocket control messages. Real-time events (telemetry, injec
 
 Three modes:
 1. **Local** — TUI + kernel on same machine (default)
-2. **Server** — `--serve --port 8443 --api-key KEY` exposes WebSocket endpoint
-3. **Client** — `--remote wss://host/ws --api-key KEY` connects TUI to remote kernel
+2. **Server** — `vulpineos serve --port 8443 --api-key KEY` exposes the panel and WebSocket endpoint
+3. **Client** — `vulpineos remote [panel|tui] --url https://host:8443 --api-key KEY` connects to a remote kernel
 
 WebSocket multiplexes: juggler messages (bidirectional), control commands (client->server), TUI state updates (server->client). API key auth via Bearer header or query param with constant-time comparison. Health check at /health.
 
@@ -359,7 +359,7 @@ make package-macos  # Create distributable .app bundle
 
 Go binary: `go build -o vulpineos ./cmd/vulpineos` (~11 MB with full TUI, remote, MCP, orchestrator).
 
-Prerequisites: macOS (Apple Silicon/Intel) or Linux (x86_64), Go 1.26+, Node.js 18+, Python 3.10+ (for mach + fingerprints), ~40 GB disk for Firefox source + artifacts.
+Prerequisites: macOS (Apple Silicon/Intel) or Linux (x86_64), Go 1.26+, Node.js 22.16+, Python 3.10+ (for mach + fingerprints), ~40 GB disk for Firefox source + artifacts.
 
 ---
 
@@ -384,7 +384,7 @@ JSON structured logger with levels (Debug/Info/Warn/Error), component tags, fiel
 
 ## Testing
 
-350+ Go tests across 37 packages, all passing with race detector. 29 API endpoints verified. 11 web panel pages. Full OpenClaw integration tested end-to-end. Foxbridge: 74/74 Juggler Puppeteer tests, 62/62 BiDi tests, 227 Go unit tests.
+495+ Go tests across 39 packages, all passing with race detector. 48 web panel control messages. 12 web panel pages. Full OpenClaw integration tested end-to-end. Foxbridge: 379 Go unit tests.
 
 ---
 
@@ -406,7 +406,7 @@ Yes — foxbridge provides full CDP support via Juggler and WebDriver BiDi. 13 C
 VulpineOS strips hidden DOM nodes (display:none, opacity:0, off-screen, clip-path) from the accessibility tree at the C++ level before the AI reads the page.
 
 **How do I deploy VulpineOS on a VPS?**
-Use Docker (Vulpine-Box): `docker compose up -d`, then connect from your laptop with `vulpineos --remote wss://your-vps:8443/ws --api-key KEY`.
+Use Docker (Vulpine-Box): `docker compose up -d`, then connect from your laptop with `vulpineos remote panel --url https://your-vps:8443 --api-key KEY`.
 
 **How do I track agent costs?**
 VulpineOS tracks per-agent token usage and estimates USD cost using built-in pricing for major models. Set budget limits to auto-pause agents that exceed spending caps.

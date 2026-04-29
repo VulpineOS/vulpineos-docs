@@ -67,19 +67,21 @@ Variables use `${VAR_NAME}` syntax. They can come from environment variables, `s
 
 ## Running Scripts
 
-Scripts can be triggered via the Juggler protocol, MCP tools, or the TUI:
+Scripts run through the web panel's **Scripts** page, which sends the
+`scripts.run` control message to the embedded runtime:
 
 ```json
-// Juggler protocol
-{ "method": "Page.runScript", "params": { "script": [...], "variables": { "SEARCH_TERM": "VulpineOS" } } }
+{
+  "command": "scripts.run",
+  "params": {
+    "contextId": "ctx-1",
+    "script": "[{\"action\":\"navigate\",\"url\":\"https://example.com\"}]"
+  }
+}
 ```
 
-```bash
-# CLI
-vulpineos --run-script login.json --var LOGIN_PASSWORD=secret
-```
-
-From the TUI, press `s` on a selected agent to attach a script that runs before the agent's first LLM call.
+The runtime executes each step against a real browser context and returns
+step-by-step results plus captured variables.
 
 ## Pre-Agent Scripts
 

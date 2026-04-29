@@ -1,6 +1,6 @@
 ---
 title: "VulpineOS Architecture — Single-Process AI Agent Runtime"
-description: "VulpineOS architecture: Go binary with 37 packages, embedded foxbridge CDP, Camoufox browser engine, orchestrator, vault, and context pool."
+description: "VulpineOS architecture: Go binary with 39 packages, embedded foxbridge CDP, Camoufox browser engine, orchestrator, vault, and context pool."
 ---
 
 # VulpineOS Architecture
@@ -73,8 +73,8 @@ OpenClaw agents connect to the browser through VulpineOS's MCP (Model Context Pr
 
 VulpineOS supports three modes:
 1. **Local** — TUI + kernel on the same machine (default)
-2. **Server** — kernel exposes a WebSocket endpoint (`--serve`)
-3. **Client** — TUI connects to a remote kernel (`--remote wss://...`)
+2. **Server** — kernel exposes a WebSocket endpoint (`vulpineos serve`)
+3. **Client** — panel or TUI connects to a remote kernel (`vulpineos remote [panel|tui]`)
 
 The remote relay multiplexes Juggler messages, control commands, and TUI state updates over a single authenticated WebSocket connection.
 

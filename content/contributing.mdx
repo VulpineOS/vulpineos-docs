@@ -18,7 +18,7 @@ VulpineOS is a personal project by Elliot, who also contributes to [Camoufox](ht
 1. Fork and clone the repo
 2. Follow the [Build from Source](/building) guide
 3. Make your changes
-4. Test with `go test ./...` (350+ tests across 37 packages)
+4. Test with `go test ./cmd/... ./internal/...` (495+ tests across 39 packages)
 5. Submit a pull request
 
 ## Code Structure
@@ -60,11 +60,11 @@ Unified diffs applied to Firefox source. The main VulpineOS-specific patch is `a
 ## Testing
 
 ```bash
-# Run all Go tests
-go test ./...
+# Run all VulpineOS Go tests
+go test ./cmd/... ./internal/...
 
 # Run with race detector
-go test -race ./...
+go test -race ./cmd/... ./internal/...
 
 # Run specific package
 go test ./internal/vault/...
