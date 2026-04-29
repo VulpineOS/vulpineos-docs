@@ -259,7 +259,7 @@ One Camoufox process shared between TUI, MCP tools, and OpenClaw agents. Shared 
 ### CDP Domain Coverage
 13 real domains translated: Target, Page, Runtime, Input, Network, Fetch, DOM, Emulation, Browser, Accessibility, Log, Security, Performance. Plus 20 stub domains (no-op success responses for Chrome-specific features).
 
-Test results: Juggler backend 74/74 Puppeteer tests passing (100%), BiDi backend 62/62 tests passing (100%), 227 Go unit tests all passing.
+Test results: Juggler backend 74/74 Puppeteer tests passing (100%), BiDi backend 62/62 tests passing (100%), 285+ Go unit tests passing.
 
 ### WebDriver BiDi Backend
 Alternative backend to Juggler using the W3C standard cross-browser automation protocol. Same Backend interface — bridge layer works unchanged. Supports all core operations: navigation, screenshots, PDF, dialogs, evaluation, input, cookies.
@@ -384,7 +384,7 @@ JSON structured logger with levels (Debug/Info/Warn/Error), component tags, fiel
 
 ## Testing
 
-500+ Go tests across 38 packages, all passing with race detector. 48 web panel control messages. 12 web panel pages. Full OpenClaw integration tested end-to-end. Foxbridge: 379 Go unit tests.
+500+ Go tests across 38 packages, all passing with race detector. 48 web panel control messages. 12 web panel pages. Full OpenClaw integration tested end-to-end. Foxbridge: 285+ Go unit tests.
 
 ---
 
