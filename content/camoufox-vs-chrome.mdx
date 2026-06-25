@@ -1,15 +1,15 @@
 ---
-title: "Camoufox vs Chrome for Browser Automation — Anti-Detect Comparison"
-description: "Compare Camoufox and Chrome for AI agent browser automation. Fingerprinting, bot detection, memory usage, and CDP compatibility."
+title: "Vulpine Browser vs Chrome for Browser Automation"
+description: "Compare Vulpine browser and Chrome for AI agent browser automation: fingerprints, automation markers, memory usage, and CDP compatibility."
 ---
 
-# Camoufox vs Chrome for Browser Automation
+# Vulpine Browser vs Chrome for Browser Automation
 
-Chrome is the default choice for browser automation, but it's fundamentally flawed for AI agents that need to browse real websites without being blocked. This comparison explains why Camoufox with foxbridge is the better choice.
+Chrome is the default choice for browser automation, but AI agents often need stronger isolation, less visible automation state, and lower per-context overhead. Vulpine browser combines the Firefox/Camoufox lineage with VulpineOS runtime controls and foxbridge CDP compatibility.
 
 ## Detection
 
-| Test | Chrome (Headless) | Chrome (Headed) | Camoufox |
+| Test | Chrome (Headless) | Chrome (Headed) | Vulpine browser |
 |------|-------------------|-----------------|----------|
 | `navigator.webdriver` | `true` | `true` (unless patched in JS) | `false` (C++ level) |
 | HeadlessChrome UA | Present | Absent | N/A (Firefox UA) |
@@ -28,34 +28,34 @@ Chrome's automation markers are baked into the browser binary:
 - All browser contexts share identical WebGL/canvas fingerprints
 - Headless mode has a different rendering pipeline that sites can detect
 
-### Why Camoufox Evades Detection
+### Why Vulpine Browser Reduces Automation Markers
 
-Camoufox is a Firefox fork with C++ level patches:
+Vulpine browser is a Firefox-based build with C++ level patches:
 - `navigator.webdriver = false` is the compiled default, not a runtime override
-- No CDP markers (Camoufox uses Juggler, not Chrome's DevTools)
+- No Chromium CDP markers in the page context
 - Each browser context gets unique fingerprints from BrowserForge
 - Same rendering pipeline in headless and headed modes
 - Real Firefox engine — sites see a normal Firefox browser
 
 ## Memory
 
-| Metric | Chrome | Camoufox |
+| Metric | Chrome | Vulpine browser |
 |--------|--------|----------|
 | Base process | ~150MB | ~200MB |
 | Per context | 50-80MB | 10-15MB |
 | 10 contexts | 650-950MB | 300-350MB |
 | 50 contexts | 2.6-4.1GB | 700-950MB |
 
-At scale, Camoufox uses 3-4x less memory. This is because Firefox shares more resources between contexts than Chrome's multi-process architecture.
+At scale, Firefox-style contexts use less memory than Chrome's multi-process architecture.
 
 ## CDP Compatibility
 
-Chrome supports CDP natively. Camoufox requires [foxbridge](https://foxbridge.vulpineos.com) to translate CDP:
+Chrome supports CDP natively. Vulpine browser uses [foxbridge](https://foxbridge.vulpineos.com) to translate CDP:
 
-| Feature | Chrome | Camoufox + Foxbridge |
+| Feature | Chrome | Vulpine browser + Foxbridge |
 |---------|--------|---------------------|
 | Puppeteer | Native | 74/74 tests passing |
-| OpenClaw | Native | Full support |
+| CDP clients | Native | Supported through foxbridge |
 | Request interception | Native | Full (Fetch domain) |
 | Screenshots | Native | Full |
 | PDF generation | Native | Full (IO streaming) |
@@ -67,7 +67,7 @@ Foxbridge achieves feature parity. The only difference is the proxy adds ~1ms of
 
 ## Per-Context Fingerprints
 
-This is Camoufox's killer feature for multi-agent setups:
+This is Vulpine browser's key feature for multi-agent setups:
 
 ```javascript
 // Chrome — all contexts are identical
@@ -75,9 +75,9 @@ const ctx1 = await chromeBrowser.createBrowserContext();
 const ctx2 = await chromeBrowser.createBrowserContext();
 // Same WebGL hash, same canvas fingerprint, same UA
 
-// Camoufox — each context has a unique identity
-const ctx1 = await camoufoxBrowser.createBrowserContext();
-const ctx2 = await camoufoxBrowser.createBrowserContext();
+// Vulpine browser — each context has a unique identity
+const ctx1 = await vulpineBrowser.createBrowserContext();
+const ctx2 = await vulpineBrowser.createBrowserContext();
 // Different WebGL, different canvas, different UA, different fonts
 ```
 
@@ -89,7 +89,7 @@ For AI agents, this means each agent appears as a completely different user. Sit
 - Testing your own websites
 - When you need Chrome-specific APIs (e.g., Chrome extensions)
 
-## When to Use Camoufox
+## When to Use Vulpine Browser
 
 - AI agents browsing real websites
 - Web scraping at scale
@@ -103,8 +103,8 @@ For AI agents, this means each agent appears as a completely different user. Sit
 # Install foxbridge
 go install github.com/VulpineOS/foxbridge/cmd/foxbridge@latest
 
-# Start with Camoufox
-foxbridge --binary /path/to/camoufox --port 9222 --headless
+# Start with Vulpine browser
+foxbridge --binary /path/to/vulpine --port 9222 --headless
 
 # Connect Puppeteer
 const browser = await puppeteer.connect({
@@ -120,5 +120,5 @@ For full agent management, use [VulpineOS](https://vulpineos.com) — it embeds 
 
 - [Getting Started](/getting-started) — Install VulpineOS
 - [Injection Filter](/injection-filter) — Security beyond stealth
-- [Foxbridge](/foxbridge) — CDP proxy for Camoufox
+- [Foxbridge](/foxbridge) — CDP proxy for Firefox-compatible browsers
 - [Architecture](/architecture) — Full VulpineOS stack

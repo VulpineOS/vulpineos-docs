@@ -1,6 +1,6 @@
 ---
 title: "VulpineOS — AI Browser Agent Operating System"
-description: "Stealth-focused browser-agent runtime on Camoufox, with operator controls, remote access, MCP tools, and source-closed commercial surfaces built on the same public stack."
+description: "Open-source browser-agent runtime with a Vulpine browser, operator controls, remote access, MCP tools, and extension seams."
 ---
 
 <div style={{ marginBottom: '2rem' }}>
@@ -9,7 +9,7 @@ description: "Stealth-focused browser-agent runtime on Camoufox, with operator c
 
 # VulpineOS
 
-Operate browser agents on a hardened Firefox runtime with real operator controls, remote access, and a clear split between the open-source stack and the commercial surfaces built on top of it.
+Operate browser agents on a hardened Firefox-based runtime with real operator controls, remote access, and a public extension surface for optional providers.
 
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '12px', margin: '1.5rem 0 2rem' }}>
   <div style={{ border: '1px solid #26263a', borderRadius: '8px', padding: '14px' }}>
@@ -21,8 +21,8 @@ Operate browser agents on a hardened Firefox runtime with real operator controls
     <div style={{ fontWeight: 700 }}>Web panel, TUI workbench, remote control plane, MCP browser tools</div>
   </div>
   <div style={{ border: '1px solid #26263a', borderRadius: '8px', padding: '14px' }}>
-    <div style={{ fontSize: '12px', color: '#888', marginBottom: '6px' }}>Commercial line</div>
-    <div style={{ fontWeight: 700 }}>Vulpine API, Vault, AudioBridge, iOS MobileBridge, future fleet products</div>
+    <div style={{ fontSize: '12px', color: '#888', marginBottom: '6px' }}>Extension seams</div>
+    <div style={{ fontWeight: 700 }}>Credentials, audio, mobile bridge, visual labels, and no-op public fallbacks</div>
   </div>
 </div>
 
@@ -30,14 +30,10 @@ Operate browser agents on a hardened Firefox runtime with real operator controls
 
 | Surface | What it is |
 |---|---|
-| **VulpineOS** | Public browser-agent runtime on Camoufox with agent orchestration, web panel, TUI, remote server, and MCP tools |
-| **Foxbridge** | Public CDP-to-Firefox bridge for OpenClaw and CDP clients |
+| **VulpineOS** | Public browser-agent runtime with Vulpine browser orchestration, web panel, TUI, remote server, and MCP tools |
+| **Foxbridge** | Public CDP-to-Firefox bridge for CDP clients |
 | **Vulpine Mark** | Public set-of-mark labeling for visual browser workflows |
 | **MobileBridge for Android** | Public Android device discovery and session control |
-| **Vulpine API** | Source-closed hosted extraction and browser workflow API |
-| **Vulpine Vault** | Source-closed credential and authenticated-workflow surface |
-| **AudioBridge** | Source-closed browser audio workflow surface |
-| **MobileBridge for iOS** | Source-closed iOS device support |
 
 ## Why VulpineOS Exists
 
@@ -64,52 +60,33 @@ The runtime is not just a browser fork. It ships with the surfaces needed to run
 |---|---|
 | [Web Panel](/web-panel) | Fleet view, agent sessions, approvals, proxies, contexts, logs, scripts, security, settings |
 | [TUI Workbench](/tui) | SSH-friendly operator view with live conversations, contexts, and browser state |
-| [Remote Access](/remote) | Remote TUI and remote panel control over the same runtime |
-| [MCP Browser Tools](/mcp-tools) | 36 tools for browser control, reliability checks, realism, screenshots, audio, and mobile workflows |
-| [Foxbridge](/foxbridge) | CDP bridge so OpenClaw can drive the same Camoufox runtime |
+| [Remote Access](/remote) | Served web panel and remote TUI control over the same runtime |
+| [MCP Browser Tools](/mcp-tools) | 38 tools for browser control, reliability checks, realism, screenshots, audio, and mobile workflows |
+| [Foxbridge](/foxbridge) | CDP bridge so compatible clients can drive the same Vulpine browser runtime |
 
 <div style={{ margin: '2rem 0' }}>
   <img src="/media/panel-dashboard.png" alt="VulpineOS operator panel" style={{ width: '100%', borderRadius: '10px', border: '1px solid #26263a' }} />
 </div>
 
-## Open Runtime, Commercial Surfaces
+## Open Runtime, Extension Surfaces
 
-The runtime and tool interfaces are public. Some higher-level product surfaces remain source-closed.
+The runtime and tool interfaces are public. Optional integrations attach behind
+stable provider interfaces; public builds return clear unavailable responses
+when a provider is not attached.
 
-| Open source | Source-closed |
-|---|---|
-| VulpineOS runtime | Vulpine API |
-| Foxbridge | Vulpine Vault |
-| Vulpine Mark | AudioBridge |
-| Android MobileBridge | iOS MobileBridge |
-
-The same public MCP and runtime interfaces can be present in both builds. Public builds return clear unavailable responses where a commercial provider is not attached. Commercial builds attach real providers behind the same surface.
-
-See [Source Availability](/source-availability) for the exact boundary and [Vulpine API Features](/api-features) for the hosted commercial surface.
-
-## Roadmap Direction
-
-The next commercial product line currently centers on:
-
-- **Vulpine Sentinel** — fleet stealth health monitoring
-- **Vulpine Replay** — deterministic replay and audit bundles
-- **Vulpine Clockwork** — mid-session identity rotation
-
-The broader roadmap also includes Prism, Pulse, Forge, Scribe, Harbor, Mesh, and Oracle as later commercial products built around the same runtime.
+See [Source Availability](/source-availability) for the exact public-source
+boundary.
 
 ## Quick Start
 
 ```bash
-git clone https://github.com/VulpineOS/VulpineOS.git
-cd VulpineOS
-make fetch
-make setup
-make dir
-make build
-./vulpineos
+curl -fsSL https://vulpineos.com/install | bash
+vulpineos
 ```
 
-Use `./vulpineos panel` for the local operator panel, `./vulpineos tui` for the terminal workbench, and `./vulpineos serve` when you need a remote control plane.
+Use `vulpineos serve` when you need a remote control plane, and
+`vulpineos remote --url http://host:8443 --api-key KEY` to connect from another
+machine.
 
 ## Read Next
 
@@ -118,4 +95,3 @@ Use `./vulpineos panel` for the local operator panel, `./vulpineos tui` for the 
 - [Web Panel](/web-panel)
 - [Remote Access](/remote)
 - [Source Availability](/source-availability)
-- [Vulpine API Features](/api-features)

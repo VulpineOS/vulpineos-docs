@@ -10,11 +10,11 @@ export const metadata = {
     default: 'VulpineOS — AI Browser Agent Operating System',
     template: '%s | VulpineOS',
   },
-  description: 'VulpineOS is the operating system for AI browser agents. Manage hundreds of OpenClaw agents on Camoufox with unique fingerprints, injection protection, and zero detection.',
+  description: 'VulpineOS is the operating system for AI browser agents. Manage browser agents on the Vulpine runtime with unique fingerprints, injection protection, and operator controls.',
   metadataBase: new URL('https://docs.vulpineos.com'),
   openGraph: {
     title: 'VulpineOS — AI Browser Agent Operating System',
-    description: 'Operate stealth and secure OpenClaw agents at scale. Built on Camoufox with injection filtering, action lock, and per-agent fingerprints.',
+    description: 'Operate secure browser agents at scale. Built on the Vulpine browser runtime with injection filtering, action lock, and per-agent fingerprints.',
     url: 'https://docs.vulpineos.com',
     siteName: 'VulpineOS Docs',
     images: [
@@ -31,13 +31,13 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'VulpineOS — AI Browser Agent Operating System',
-    description: 'Operate stealth and secure OpenClaw agents at scale on Camoufox.',
+    description: 'Operate secure browser agents at scale on the Vulpine browser runtime.',
     images: ['/VulpineOSBanner.png'],
   },
   alternates: {
     canonical: 'https://docs.vulpineos.com',
   },
-  keywords: ['VulpineOS', 'AI browser agent', 'OpenClaw', 'Camoufox', 'browser automation', 'prompt injection', 'anti-detect browser', 'browser fingerprint', 'action lock', 'CDP proxy', 'foxbridge', 'AI agent security', 'stealth browser', 'browser agent operating system'],
+  keywords: ['VulpineOS', 'AI browser agent', 'Vulpine browser', 'Firefox automation', 'browser automation', 'prompt injection', 'browser fingerprint', 'action lock', 'CDP proxy', 'foxbridge', 'AI agent security', 'browser agent operating system'],
 }
 
 const logo = (
@@ -67,7 +67,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               '@context': 'https://schema.org',
               '@type': 'SoftwareApplication',
               name: 'VulpineOS',
-              description: 'The operating system for AI browser agents — manage hundreds of OpenClaw agents on Camoufox with unique fingerprints, injection protection, and zero detection',
+              description: 'The operating system for AI browser agents — manage browser agents on the Vulpine runtime with unique fingerprints, injection protection, and operator controls',
               url: 'https://docs.vulpineos.com',
               applicationCategory: 'DeveloperApplication',
               operatingSystem: 'macOS, Linux',

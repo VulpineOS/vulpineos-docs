@@ -18,7 +18,7 @@ VulpineOS is a personal project by Elliot, who also contributes to [Camoufox](ht
 1. Fork and clone the repo
 2. Follow the [Build from Source](/building) guide
 3. Make your changes
-4. Test with `go test ./cmd/... ./internal/...` (500+ tests across 38 packages)
+4. Test with `go test ./cmd/... ./internal/...` (500+ tests across 51 packages)
 5. Submit a pull request
 
 ## Code Structure
@@ -33,7 +33,7 @@ VulpineOS is a personal project by Elliot, who also contributes to [Camoufox](ht
 | `vault/` | SQLite identity/agent storage |
 | `pool/` | Browser context pooling |
 | `orchestrator/` | Ties kernel + pool + vault + agents together |
-| `openclaw/` | OpenClaw agent subprocess management |
+| `openclaw/` | Agent session/runtime compatibility layer |
 | `mcp/` | MCP server for browser tools |
 | `remote/` | WebSocket server/client for remote access |
 | `proxy/` | Proxy parsing, geo resolution, fingerprint sync |

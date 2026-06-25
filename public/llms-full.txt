@@ -1,415 +1,191 @@
-# VulpineOS — Comprehensive Documentation
+# VulpineOS — Public Documentation Summary
 
-> Operate Stealth and Secure OpenClaw Agents at Scale
+> Open-source browser-agent runtime with a Vulpine browser, operator controls, remote access, MCP tools, and extension seams.
 
-VulpineOS is the operating system for AI browser agents. Built on Camoufox (a hardened Firefox 146.0.1 fork originally created by daijro), it manages hundreds of OpenClaw agents with unique identities, full security, and zero detection. VulpineOS ships as a single Go binary with 38 packages, an embedded web panel, an embedded foxbridge CDP server, and a terminal-based TUI — all sharing a single Camoufox browser process.
+VulpineOS launches a Vulpine-branded Firefox 146.0.1 browser and gives AI browser agents isolated contexts, browser tools, persistent state, and operator-facing control surfaces. The public runtime ships as a Go binary with a terminal workbench, served web panel, remote HTTP/WebSocket control plane, MCP server, embedded foxbridge CDP endpoint, vault, context pool, and browser security patches.
 
 - Documentation: https://docs.vulpineos.com
 - Repository: https://github.com/VulpineOS/VulpineOS
 - Foxbridge: https://github.com/VulpineOS/foxbridge
-- Foxbridge Docs: https://foxbridge.vulpineos.com
+- Foxbridge docs: https://foxbridge.vulpineos.com
 
----
+## Install
 
-## The Three Core Problems VulpineOS Solves
-
-1. **Prompt Injection** — Malicious websites hide invisible text in the DOM (via CSS tricks like `display: none`, `opacity: 0`, off-screen positioning, `clip-path: inset(100%)`) that hijacks the agent's instructions. Current agents have zero defense against this.
-
-2. **Page Mutation** — The page changes between when the agent reads it and when it acts. JavaScript timers, animations, and network callbacks mutate the DOM mid-decision, causing agents to click on elements that no longer exist or have moved.
-
-3. **Token Waste** — Accessibility trees are bloated with structural noise. Agents burn 50-70% of their context window on wrapper divs, generic groups, and redundant whitespace that carry no semantic value.
-
-VulpineOS addresses each problem at the browser engine level — not with JavaScript hacks or post-processing, but with C++ patches to Firefox's core.
-
----
-
-## Phase 1: Injection-Proof Accessibility Filter
-
-Strips non-visible DOM nodes from the accessibility tree before they reach the AI agent, preventing indirect prompt injection attacks.
-
-The filter intercepts the `_getFullAXTree()` method in `PageAgent.js`. Before recursing into each child node, the filter runs `isNodeVisuallyHidden()` — if the node is hidden, the entire subtree is pruned.
-
-### Visibility Checks (ordered by computational cost, short-circuits early)
-
-1. `aria-hidden="true"` (DOM attribute)
-2. `display: none` (computed style)
-3. `visibility: hidden/collapse` (computed style)
-4. `opacity: 0` (computed style)
-5. Zero dimensions + `overflow: hidden` (bounding rect)
-6. Off-screen by >500px (bounding rect)
-7. `clip-path: inset(100%)` / `clip: rect(0,0,0,0)` (computed style)
-
-When the filter strips a hidden node containing text, it emits an `injectionAttemptDetected` event through the Juggler protocol. The TUI displays alerts in real-time, and the telemetry service tracks a detection risk score.
-
-Protocol: `Page.getFullAXTree` with `vulpineos.injection_filter.enabled` preference (default: true).
-
-Files: `additions/juggler/content/PageAgent.js`, `settings/camoufox.cfg`
-
----
-
-## Phase 2: Action Lock (Deterministic Execution)
-
-Freezes the page completely while the AI agent is thinking. No JavaScript, no timers, no layout reflows, no animations, no events. The page the agent analyzed is exactly the page it acts on.
-
-Action Lock patches Firefox's C++ core (`nsDocShell`) with two new methods:
-
-- `suspendPage()` — freezes the refresh driver, suspends all timers/intervals/network callbacks, and suppresses event handling
-- `resumePage()` — reverses the freeze in opposite order
-
-Freeze pipeline:
-1. `allowJavascript = false` on all frames
-2. `nsRefreshDriver::Freeze()` — no layout reflow, no CSS animation ticks, no requestAnimationFrame
-3. `nsPIDOMWindowInner::Suspend()` — setTimeout/setInterval paused, promise microtasks held, network callbacks queued
-4. `PresShell::SuppressEventHandling()` — mouse/keyboard events dropped, mutation observers paused
-
-Navigation auto-releases the lock to prevent deadlocks.
-
-Protocol: `Page.setActionLock({ enabled: boolean })`, toggle via `vulpineos.actionlock.enabled` pref.
-
-Files: `patches/action-lock.patch`, `additions/juggler/content/main.js`, protocol/handler wiring
-
----
-
-## Phase 3: Token-Optimized DOM Export
-
-Compressed semantic JSON snapshot of the page for LLM context windows, achieving over 50% token reduction compared to the standard accessibility tree.
-
-Output format uses array-of-tuples: `[depth, roleCode, name, props?]`
-
-```json
-{"v":1,"title":"...","url":"...","nodes":[[0,"doc","Page"],[1,"h1","Welcome"],[1,"btn","Submit"]]}
+```bash
+curl -fsSL https://vulpineos.com/install | bash
+vulpineos
 ```
 
-Compression strategies:
-- Short role codes: `heading` -> `h2`, `button` -> `btn`, `link` -> `lnk` (~30% savings on role strings)
-- Skip structural wrappers: `section`, `group`, `paragraph` removed (~20% node reduction)
-- Single-child flattening: parent with one child merged (~10% node reduction)
-- Adjacent text merging: multiple text nodes combined (~5% token reduction)
-- Omit empty/default fields (~5% overhead reduction)
-
-Over 50 roles mapped to short codes including: doc, btn, lnk, txt, chk, rad, cmb, li, nav, tbl, row, cel, img, hN.
-
-Protocol: `Page.getOptimizedDOM({ maxDepth?, maxNodes?, maxTextLength? })`
-
-Files: `additions/juggler/content/PageAgent.js`, `additions/juggler/protocol/Protocol.js`
-
----
-
-## Phase 4: Autonomous Trust Warming
-
-Background service that warms browser profiles on high-authority sites with human-like interactions while the agent is idle. Opt-in (default off) since aggressive warming can trigger bot detection.
-
-State machine: `STOPPED -> IDLE -> WARMING -> PAUSING -> IDLE`
-
-Human-like interactions include:
-- Bezier mouse trajectories (JS port of C++ MouseTrajectories.hpp) with overshoot and correction
-- Gaussian-randomized timing for dwell, scroll pauses, hover durations
-- Interaction sequences: scrolling, hovering, occasional clicks, natural dwell time
-
-Default sites (weighted): Google, YouTube, Wikipedia, Reddit, Amazon, Hacker News, GitHub.
-
-Protocol: `Browser.startTrustWarming`, `Browser.stopTrustWarming`, `Browser.getTrustWarmingStatus`, `Browser.notifyTrustWarmingIdle`, `Browser.notifyTrustWarmingBusy`
-
-Files: `additions/juggler/TrustWarmService.js`
-
----
-
-## Advanced Security Features
-
-Beyond the core injection filter, VulpineOS includes four additional security layers:
-
-### CSP Injection
-Automatically injects strict Content Security Policy on every page load, blocking inline scripts and unauthorized external resources. Applied at the C++ network layer before the renderer sees the response.
-
-### DOM Mutation Monitoring
-MutationObserver at the document root watches for suspicious DOM changes after initial page load. Dynamically inserted hidden elements containing text are flagged and emit `injectionAttemptDetected` events. Mutations are risk-scored and feed into the telemetry risk gauge.
-
-### Prompt Injection Signatures
-13 known injection patterns scanned against all text content entering the agent's context:
-1. Instruction override ("Ignore all previous instructions")
-2. Role hijack ("You are now a helpful assistant that...")
-3. System prompt leak ("Repeat your system prompt")
-4. Tool abuse ("Call the navigate tool to visit evil.com")
-5. Data exfiltration ("Send the page cookies to...")
-6. Action coercion ("Click the Pay Now button")
-7. Context confusion ("The user said to...")
-8. Encoding evasion (Base64/hex-encoded instructions)
-9. Markdown injection (hidden links in markdown)
-10. Delimiter attacks (fake `<|endoftext|>` tokens)
-11. Multi-language evasion (instructions in non-English text)
-12. Unicode homoglyphs (visually similar characters hiding directives)
-13. Nested injection (injection inside ARIA labels or alt text)
-
-High-confidence matches (patterns 1, 2, 6) trigger immediate alerts.
-
-### Sandboxed JS Evaluation
-Agent JavaScript runs in Firefox's `Cu.Sandbox` with explicit allowlist. Can read DOM, text, styles, serialize data. Cannot fetch, access cookies, write storage, or nested eval.
-
-Files: `internal/security/csp.go`, `internal/security/mutations.go`, `internal/security/signatures.go`, `internal/security/sandbox.go`
-
----
-
-## Token Optimization (4 Layers)
-
-### Viewport Pruning
-Only nodes visible in the current viewport (plus configurable 200px buffer) are included. Reduces ~50,000 token page to ~3,000-5,000 tokens (90-94% reduction).
-
-### Result Caching
-Consecutive snapshots of the same unchanged page return a cache hit flag (12 tokens) instead of re-serializing. Auto-invalidated on navigation, DOM mutations, or scroll beyond viewport buffer.
-
-### Incremental Snapshots
-Partial page changes send only the delta (added, removed, modified nodes). Typically 80% smaller than full snapshots. Dropdown open: 87% reduction. Form field update: 94% reduction. Tab switch: 72% reduction.
-
-### Tool Call Batching
-Multiple tool calls in a single agent turn are batched into one Juggler round-trip. Saves ~200ms latency per additional call and avoids redundant serialization.
-
-End-to-end example: 5 interactions with a search page use 8,120 tokens vs ~200,000 without optimization (96% savings).
-
-Files: `internal/tokenopt/viewport.go`, `internal/tokenopt/cache.go`, `internal/tokenopt/diff.go`, `internal/tokenopt/batch.go`
-
----
-
-## MCP Tools (36 Tools)
-
-VulpineOS provides a Model Context Protocol server (`./vulpineos mcp`) exposing browser automation, reliability checks, human-like actions, and extension surfaces as tool calls:
-
-Core browser controls: vulpine_navigate, vulpine_snapshot, vulpine_click, vulpine_type, vulpine_screenshot, vulpine_scroll, vulpine_new_context, vulpine_close_context, vulpine_get_ax_tree, vulpine_click_ref, vulpine_type_ref, vulpine_hover_ref.
-
-Reliability and interaction tools: vulpine_wait, vulpine_find, vulpine_verify, vulpine_screenshot_diff, vulpine_page_settled, vulpine_select_option, vulpine_fill_form, vulpine_page_info, vulpine_press_key, vulpine_clear_input, vulpine_get_form_errors.
-
-Human-realism tools: vulpine_human_click, vulpine_human_type, vulpine_human_scroll.
-
-Extension surfaces: vulpine_annotated_screenshot, vulpine_click_label, vulpine_get_credential, vulpine_autofill, vulpine_start_audio_capture, vulpine_stop_audio_capture, vulpine_read_audio_chunk, vulpine_list_mobile_devices, vulpine_connect_mobile_device, vulpine_disconnect_mobile_device.
-
-Recommended workflow: snapshot -> read @refs -> click_ref/type_ref -> snapshot again. Refs resolve to actual DOM elements, scroll into view, and compute center point automatically.
-
-Files: `internal/mcp/`
-
----
-
-## Vulpine API Features
-
-Product names and capabilities are public; source availability depends on whether the component is open infrastructure or a commercial extension.
-
-Open source components: VulpineOS (runtime, MCP tools, web panel, TUI, remote server), Foxbridge (CDP-to-Firefox bridge), Vulpine Mark (Set-of-Mark screenshots and label interactions), MobileBridge for Android (Android discovery, CDP proxying, gestures, and sessions).
-
-Commercial extension surfaces: Vulpine Vault (credential metadata, autofill, secure input, TOTP, provider imports), AudioBridge (browser audio capture and audio chunk streaming), MobileBridge for iOS (iOS discovery, Web Inspector bridging, mobile sessions), Vulpine API (hosted extraction, browser sessions, recurring monitors, account operations, billing, fleet controls).
-
-Current Vulpine API endpoints: extraction (`POST /v1/extract`), batch extraction (`POST /v1/batch`), async task polling and cancellation, extraction history, recurring monitors, usage, API keys, and provider listing. Extraction accepts JSON Schema or natural-language prompts, supports sync and async execution, can opt into pagination, and returns usage metadata such as completeness, token count, retries, and estimated cost. The dedicated API reference documents endpoint auth, payloads, response shapes, monitor limitations, and SDK examples.
-
-Planned commercial products: Vulpine Sentinel (stealth health monitoring for browser-agent fleets), Vulpine Replay (deterministic debugging and audit bundles), Vulpine Clockwork (mid-session identity rotation), Vulpine Prism (managed third-party behavior controls), Vulpine Pulse (human behavior modeling), Vulpine Forge (automation for WebAssembly-heavy apps), Vulpine Scribe (deep network traces), Vulpine Harbor (virtual file workspace), Vulpine Mesh (high-throughput browser-agent transport), and Vulpine Oracle (JavaScript execution recording and analysis). These are public product names; source code and implementation details remain source-closed unless explicitly noted.
-
-Planned API feature families include authenticated extraction, visual extraction, browser audio workflows, mobile extraction, protected crawl, and recurring monitors. These are commercial hosted API surfaces built on the open-source runtime plus source-closed extensions.
-
-Stable MCP mappings: Set-of-Mark uses vulpine_annotated_screenshot and vulpine_click_label. Vulpine Vault uses vulpine_get_credential and vulpine_autofill. AudioBridge uses vulpine_start_audio_capture, vulpine_stop_audio_capture, and vulpine_read_audio_chunk. MobileBridge uses vulpine_list_mobile_devices, vulpine_connect_mobile_device, and vulpine_disconnect_mobile_device.
-
-Public docs include a launch checklist covering source boundaries, docs drift checks, visual review, API preview verification, Linear handoff, and release commands.
-
----
-
-## Agent Scripting DSL
-
-JSON-based scripting for repetitive browser tasks without LLM tokens. 8 actions:
-
-- **navigate** — Go to URL
-- **click** — Click element by CSS selector
-- **type** — Type text into input (optionally clear first)
-- **wait** — Wait for element or fixed delay
-- **extract** — Extract text/attribute into a variable
-- **screenshot** — Capture screenshot
-- **set** — Set a variable
-- **if** — Conditional branching (equals/contains with then/else)
-
-Variable expansion via `${VAR_NAME}` from environment, `set` actions, or `extract` results. Pre-agent scripts (e.g., login) run before the agent's first LLM call, so the agent starts on an authenticated page without spending tokens on login flow.
-
-Files: `internal/scripting/`
-
----
-
-## Agent-to-Agent Communication Bus
-
-Structured message-passing with four types: ask (request info), delegate (assign subtask), reply (response), notify (broadcast).
-
-All inter-agent communication is default deny. Per-pair and wildcard policies control allowed message paths. Messages can require human approval — held in a queue for operator approve/reject.
-
-Security: no direct connections (all routed through orchestrator), 100KB payload limit, 10 msg/sec rate limit per agent, no self-messaging, timeout enforcement on ask/delegate.
-
-Full audit trail in vault database with timestamp, sender/recipient, type, payload hash, policy evaluation result.
-
-Files: `internal/agentbus/`
-
----
-
-## Cost Tracking
-
-Per-agent token usage with USD cost estimation. Every LLM call tracked with input tokens, output tokens, model. Built-in pricing for Claude Sonnet 4, Claude Opus 4, Claude Haiku 3.5, GPT-4o, GPT-4o mini, Gemini 2.5 Pro, Gemini 2.5 Flash. Custom pricing configurable.
-
-Budget limits: per-agent or global caps. When reached, agent is paused. Reset intervals: hourly, daily, weekly, or lifetime. Alert thresholds at configurable percentages (default 80%). Webhook integration for budget events signed with HMAC-SHA256.
-
-Files: `internal/costtrack/`
-
----
-
-## Foxbridge CDP Proxy
-
-Foxbridge translates Chrome DevTools Protocol (CDP) into Firefox's Juggler and WebDriver BiDi protocols. In VulpineOS, it runs as an embedded CDP server on :9222 — not a separate process.
-
-One Camoufox process shared between TUI, MCP tools, and OpenClaw agents. Shared browser contexts with persistent fingerprints and cookies.
-
-### CDP Domain Coverage
-13 real domains translated: Target, Page, Runtime, Input, Network, Fetch, DOM, Emulation, Browser, Accessibility, Log, Security, Performance. Plus 20 stub domains (no-op success responses for Chrome-specific features).
-
-Test results: Juggler backend 74/74 Puppeteer tests passing (100%), BiDi backend 62/62 tests passing (100%), 285+ Go unit tests passing.
-
-### WebDriver BiDi Backend
-Alternative backend to Juggler using the W3C standard cross-browser automation protocol. Same Backend interface — bridge layer works unchanged. Supports all core operations: navigation, screenshots, PDF, dialogs, evaluation, input, cookies.
-
-### Event Translation
-Juggler events translated to CDP events in Chrome's exact ordering. Navigation lifecycle (init, commit, load, DOMContentLoaded), target events with dual session model (tab + page), execution context ID mapping (string to numeric), console events, dialog events, network events, frame events.
-
-### CLI
-`foxbridge --binary /path/to/camoufox --port 9222` (Juggler) or `foxbridge --backend bidi --binary /path/to/firefox --port 9222` (BiDi). HTTP discovery at `/json/version` and `/json/list`.
-
-Repository: https://github.com/VulpineOS/foxbridge
-
----
-
-## Architecture
-
-### System Stack
-```
-Web Panel (React, embedded) / TUI (Bubbletea)
-  -> Orchestrator + Pool + Vault + MCP + AgentBus + CostTracker + Webhooks + Recording + PageCache + Security + TokenOpt + Scripting + ProxyRotation
-    -> Embedded Foxbridge CDP Server (:9222)
-      -> Juggler Protocol (FD 3/4 pipe, null-byte delimited JSON)
-        -> Camoufox (Firefox 146.0.1) with C++ patches
+The installer downloads the latest published VulpineOS CLI and matching Vulpine browser bundle for the current platform, installs `vulpineos` onto PATH, and stores the browser path in `~/.vulpineos/config.json`.
+
+For source builds:
+
+```bash
+git clone https://github.com/VulpineOS/VulpineOS.git
+cd VulpineOS
+make fetch
+make setup
+make dir
+make build
+go build -o vulpineos ./cmd/vulpineos
+./vulpineos --binary /path/to/vulpine
 ```
 
-### Juggler Protocol
-JSON-RPC layer over pipe (FD 3 read, FD 4 write) with null-byte delimited frames. Key domains: Browser (context management, telemetry, trust warming, cookies), Page (navigation, snapshots, action lock, AX tree, optimized DOM).
+## Main Commands
 
-### Go Runtime (38 Packages)
+```bash
+vulpineos
+vulpineos --no-browser
+vulpineos serve --host 0.0.0.0 --port 8443 --no-tls --api-key KEY
+vulpineos remote --url http://host:8443 --api-key KEY
+vulpineos mcp
+```
 
-- **Kernel** (`internal/kernel/`): Start/Stop/Wait, spawns Firefox with pipe FDs, auto-detects binary. Watchdog monitors every 2s, auto-restarts on crash (up to 3 attempts).
-- **Juggler Transport** (`internal/juggler/`): PipeTransport with FD 3/4, Client with Call() (sync RPC) + Subscribe() (event handlers).
-- **Context Pool** (`internal/pool/`): Pre-warm 10 contexts, max 20 concurrent, recycle after 50 uses, configurable memory limits per context.
-- **Identity Vault** (`internal/vault/`): SQLite (WAL mode + foreign keys). Schema: citizens, citizen_cookies, citizen_storage, templates, nomad_sessions, agents, agent_messages, proxies. Persistent identities with cookies, localStorage, fingerprint seeds. Templates for reusable SOPs. Ephemeral nomad sessions.
-- **Orchestrator** (`internal/orchestrator/`): SpawnCitizen() loads identity + cookies, acquires context, applies fingerprint, spawns agent. SpawnNomad() creates ephemeral session. Auto-releases context slots on completion.
-- **OpenClaw Manager** (`internal/openclaw/`): Spawn/kill agents, status channel, auto-cleanup. SpawnWithSession/ResumeWithSession for persistent named sessions. SOP file injection. 30 providers supported (Anthropic, OpenAI, Google, xAI, Ollama, OpenRouter, Groq, Mistral, Together, Cerebras, etc.).
-- **Remote** (`internal/remote/`): HTTP/WS server with /ws and /health endpoints. WS client implementing juggler.Transport. API key auth (constant-time compare). Web panel: 46 control messages. Primary modes: local TUI, local panel, served panel/API, remote panel/TUI, and stdio MCP.
-- **Proxy System** (`internal/proxy/`): ParseProxyURL, ParseProxyList (bulk import), ResolveGeo (ip-api.com), TestProxy (latency). SyncFingerprintToProxy injects geolocation, timezone, WebRTC IP, locale (32 countries). Auto-rotation on rate limit/IP block/time interval.
-- **Monitor** (`internal/monitor/`): Pattern-based scanning of agent output for 429/rate limit, captcha/challenge, blocked/forbidden. Per-agent failure tracking, requires 2+ hits to avoid false positives.
-- **Fingerprint System**: Two-tier — (1) Full Camoufox pipeline via Python subprocess (BrowserForge Bayesian network + WebGL DB with 147 GL params + OS-matched fonts), (2) Fallback with OS-consistent profiles. Locked to host OS.
+`vulpineos panel`, `vulpineos tui`, `vulpineos remote panel`, and `vulpineos remote tui` are removed compatibility commands. Use `vulpineos` for the local TUI, `vulpineos serve` for the web panel/control plane, and `vulpineos remote --url ...` for the remote TUI.
 
----
+## Core Security Features
+
+### Injection-Proof Accessibility Filter
+
+The accessibility-tree path strips non-visible DOM nodes before content reaches the agent. Checks include `aria-hidden`, `display:none`, hidden/collapsed visibility, `opacity:0`, hidden zero-size boxes, far off-screen positioning, and clipping tricks. Hidden text can emit `injectionAttemptDetected` telemetry.
+
+Protocol: `Page.getFullAXTree`.
+
+Preference: `vulpineos.injection_filter.enabled` in `settings/vulpine.cfg`.
+
+### Action Lock
+
+Action lock freezes page execution while the agent is deciding. It disables JavaScript on frames, suspends page timers/network callbacks, freezes refresh-driver work, and suppresses event handling. Navigation auto-releases the lock.
+
+Protocol: `Page.setActionLock({ enabled: boolean })`.
+
+Preference: `vulpineos.actionlock.enabled`.
+
+### Optimized DOM Export
+
+Optimized DOM export returns compressed semantic JSON with short role codes, structural wrapper removal, text merging, and default-field omission. It is designed to reduce token usage compared with raw accessibility trees.
+
+Protocol: `Page.getOptimizedDOM({ maxDepth?, maxNodes?, maxTextLength? })`.
+
+Preference: `vulpineos.dom_export.enabled`.
+
+### Trust Warming
+
+Trust warming is an opt-in background service for profile warm-up while agents are idle. It is off by default.
+
+Preference: `vulpineos.trustwarm.enabled`.
+
+## Runtime Architecture
+
+```text
+TUI / Web Panel / MCP Tools
+  -> Orchestrator + Vault + Context Pool + Remote API
+    -> Embedded foxbridge CDP endpoint
+      -> Juggler pipe
+        -> Vulpine browser (single process, per-agent contexts)
+```
+
+### Go Runtime
+
+- `internal/kernel`: starts/stops the browser, resolves the Vulpine binary, and watches for crashes.
+- `internal/juggler`: pipe transport and JSON-RPC client.
+- `internal/pool`: pre-warmed browser contexts and recycling.
+- `internal/vault`: SQLite storage for identities, cookies, templates, agents, messages, proxies, and fingerprints.
+- `internal/orchestrator`: ties kernel, pool, vault, and agent runtime together.
+- `internal/mcp`: stdio MCP server with browser tools.
+- `internal/remote`: HTTP/WebSocket server, remote client, panel control API, auth, and health checks.
+- `internal/extensions`: no-op public interfaces for optional credential, audio, mobile, and observability providers.
 
 ## TUI Workbench
 
-3-column terminal interface built with Bubbletea/Lipgloss:
-- Left: system info (kernel status, memory, risk, pool stats) + agent list with status icons
-- Center: full-height conversation panel with color-coded messages and input
-- Right: agent detail (name, status, tokens, task, fingerprint, proxy) + active browser contexts
+The main workbench is command-first:
 
-Key bindings: n (new agent), j/k (navigate), Enter (send message), p (pause), r (resume), x (delete), Shift+S (settings), c (reconfigure), Tab (focus cycle), q (quit).
+- Type into the chat input and press `Enter` to send.
+- Type `/` to open the command palette.
+- Use `Up`/`Down` and `Enter` inside the palette.
+- Use `Esc` to close menus, cancel selection, or clear chat selection.
+- Click agent rows to switch agents.
+- Wheel over the chat or agent list to scroll.
+- Use slash commands such as `/new`, `/agents`, `/view`, `/hide`, `/log`, `/trace`, `/copy`, `/settings`, `/config`, and `/quit`.
+- `Cmd+C` copies selected chat text on macOS.
+- `Ctrl+C` is an emergency quit confirmation.
 
-Settings panel: 3 tabs — General (provider/model/key), Proxies (import/test/delete/geo), Skills (toggle global skills).
-
-Agent lifecycle: CREATE -> ACTIVE -> PAUSED -> ACTIVE -> COMPLETED/FAILED. Conversations persist in vault. Fingerprints survive across sessions.
-
----
+The system panel surfaces runtime status such as memory, lag, browser mode, route, window state, context/page counts, and runtime alerts.
 
 ## Web Panel
 
-React SPA (Vite) embedded in Go binary via go:embed. 12 pages: Dashboard, Agents, AgentDetail, Bus, Contexts, Proxies, Security, Webhooks, Scripts, Settings, Logs, Login.
-
-46 control messages across 14 domains: agents, config, costs, webhooks, proxies, bus, recording, fingerprints, scripts, security, status, sentinel availability, runtime audit, and contexts.
-
-Communication via WebSocket control messages. Real-time events (telemetry, injection alerts, agent status) broadcast to all connected clients.
-
----
-
-## Remote Access
-
-Three modes:
-1. **Local** — TUI + kernel on same machine (default)
-2. **Server** — `vulpineos serve --port 8443 --no-tls --api-key KEY` exposes the panel and WebSocket endpoint over HTTP/WS
-3. **Client** — `vulpineos remote [panel|tui] --url http://host:8443 --api-key KEY` connects to a remote kernel
-
-WebSocket multiplexes: juggler messages (bidirectional), control commands (client->server), TUI state updates (server->client). API key auth via Bearer header or query param with constant-time comparison. Health check at /health.
-
----
-
-## Docker (Vulpine-Box)
-
-Container launch: set `VULPINE_API_KEY`, then run `docker compose up -d`. Multi-stage build: Go binary (CGO_ENABLED=0, stripped) + Ubuntu 22.04 + GTK/X11 + Xvfb + Camoufox + Node.js/OpenClaw. The stock compose path serves plain HTTP on port 8443 unless TLS certificate paths are provided.
-
-Persistent volumes: vulpineos-data (/root/.vulpineos for SQLite vault, agents, config), vulpine-profiles (/opt/vulpineos/profiles for browser profiles/cache). 4GB memory limit (supports 20-30 concurrent contexts). TLS via mounted certificates.
-
----
-
-## Build System
+The web panel is embedded in the Go binary and served by:
 
 ```bash
-make fetch     # Download Firefox 146.0.1 source (~300 MB)
-make setup     # Extract + init git repo
-make dir       # Apply patches (scripts/patch.py) + copy additions (scripts/copy-additions.sh)
-make build     # Compile with ./mach (artifact builds on M1: ~5 min, full Linux: 30-60 min)
-make package-macos  # Create distributable .app bundle
+vulpineos serve --host 0.0.0.0 --port 8443 --no-tls --api-key KEY
 ```
 
-Go binary: `go build -o vulpineos ./cmd/vulpineos` (~11 MB with full TUI, remote, MCP, orchestrator).
+The panel includes dashboard, agents, agent detail, bus, contexts, proxies, security, webhooks, scripts, logs, login, and settings pages. It authenticates with the same access key used by the remote TUI.
 
-Prerequisites: macOS (Apple Silicon/Intel) or Linux (x86_64), Go 1.26+, Node.js 22.16+, Python 3.10+ (for mach + fingerprints), ~40 GB disk for Firefox source + artifacts.
+## MCP Browser Tools
 
----
+VulpineOS exposes 36 MCP browser tools:
 
-## Additional Systems
+- Core browser control: navigate, snapshot, click, type, screenshot, scroll, scroll into view, new/close context, AX tree, click/type/hover by ref, element status.
+- Reliability and interaction: wait, find, verify, screenshot diff, page settled, select option, fill form, page info, press key, clear input, form errors.
+- Human realism: human click, human type, human scroll.
+- Extension surfaces: annotated screenshot, click label, credential metadata, autofill request, audio capture handles, audio chunk read, mobile device list/connect/disconnect.
 
-### Webhook Notifications
-HTTP webhooks for events: agent.completed/failed/paused, rate_limit.detected, injection.detected, budget.alert/exceeded. Async delivery with 10s timeout. Secret header (X-Vulpine-Signature) for HMAC-SHA256 verification.
+Public builds return clear unavailable responses for extension tools when no provider is registered.
 
-### Session Recording & Replay
-Records browser actions as timestamped timeline per agent. Export to JSON. Terminal-based replay viewer with real-time playback at original speed.
+## Foxbridge
 
-### Persistent Page Cache
-Saves/restores page state across agent restarts: URL, HTML, cookies, scroll position, form values, title. Persisted to ~/.vulpineos/pagecache/ as JSON.
+Foxbridge translates Chrome DevTools Protocol to Firefox Juggler or WebDriver BiDi. In VulpineOS it can run embedded against the same browser process, so compatible CDP clients share the runtime path instead of launching a second browser.
 
-### Telemetry Service
-Collects memory via nsIMemoryReporterManager, counts contexts/pages, manages detection risk score. Emits telemetryUpdate every 2s. Handles injectionAttemptDetected events.
+Standalone example:
 
-### Structured Logging
-JSON structured logger with levels (Debug/Info/Warn/Error), component tags, field chaining.
+```bash
+go install github.com/VulpineOS/foxbridge/cmd/foxbridge@latest
+foxbridge --binary /path/to/vulpine --port 9222
+```
 
----
+## Docker
 
-## Testing
+Vulpine-Box expects a prebuilt Linux Vulpine browser bundle at:
 
-500+ Go tests across 38 packages, all passing with race detector. 46 web panel control messages. 12 web panel pages. Full OpenClaw integration tested end-to-end. Foxbridge: 285+ Go unit tests.
+```text
+dist/vulpine-linux/vulpine
+```
 
----
+Run:
+
+```bash
+export VULPINE_API_KEY=$(openssl rand -hex 32)
+docker compose up -d
+```
+
+The stock container starts `vulpineos serve --binary ./browser/vulpine --port 8443 --no-tls`.
+
+## Source Boundary
+
+Open public repositories:
+
+- `VulpineOS/VulpineOS`
+- `VulpineOS/foxbridge`
+- `VulpineOS/vulpine-mark`
+- `VulpineOS/mobilebridge`
+- `VulpineOS/vulpineos-docs`
+
+Public docs and repositories should include open-source implementation, stable public interfaces, no-op provider fallbacks, and release documentation. Private provider implementations, credentials, detector notes, unreleased product plans, private build wiring, and internal plan docs should stay out of public repositories.
 
 ## Common Questions
 
-**How do I use Puppeteer with Firefox?**
-Install foxbridge, run with `--binary /path/to/firefox`, connect Puppeteer to `ws://localhost:9222`.
+**How do I use Puppeteer with Firefox or Vulpine browser?**
+Run foxbridge with `--binary /path/to/vulpine --port 9222` and connect the CDP client to `ws://localhost:9222`.
 
-**How do I make OpenClaw use Camoufox instead of Chrome?**
-Set `"cdpUrl": "ws://127.0.0.1:9222"` in openclaw.json. VulpineOS does this automatically.
+**How do agents get unique fingerprints?**
+VulpineOS creates isolated browser contexts per agent, each with its own generated fingerprint, cookies, storage, and runtime state.
 
-**How do I run multiple agents with different fingerprints?**
-VulpineOS creates isolated browser contexts per agent, each with a unique BrowserForge fingerprint (user agent, screen, WebGL, canvas/audio seeds).
+**How do I prevent prompt injection in browser-agent tasks?**
+Use the VulpineOS snapshot or accessibility-tree tools. Hidden DOM filtering is enabled by default before page content reaches the agent.
 
-**Is there CDP support for Firefox?**
-Yes — foxbridge provides full CDP support via Juggler and WebDriver BiDi. 13 CDP domains translated, 74/74 Puppeteer tests passing.
+**How do I run the web panel?**
+Run `vulpineos serve --host 0.0.0.0 --port 8443 --no-tls --api-key KEY` and open the printed panel URL in a browser.
 
-**How do I prevent prompt injection in AI browser agents?**
-VulpineOS strips hidden DOM nodes (display:none, opacity:0, off-screen, clip-path) from the accessibility tree at the C++ level before the AI reads the page.
-
-**How do I deploy VulpineOS on a VPS?**
-Use Docker (Vulpine-Box): set `VULPINE_API_KEY`, run `docker compose up -d`, then connect from your laptop with `vulpineos remote panel --url http://your-vps:8443 --api-key KEY`.
-
-**How do I track agent costs?**
-VulpineOS tracks per-agent token usage and estimates USD cost using built-in pricing for major models. Set budget limits to auto-pause agents that exceed spending caps.
-
-**How do I automate login without using LLM tokens?**
-Use the Agent Scripting DSL to define a JSON login script. Attach it as a pre-agent script — the agent starts on an authenticated page without spending tokens on login.
+**How do I run the remote TUI?**
+Run `vulpineos remote --url http://host:8443 --api-key KEY`.

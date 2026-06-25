@@ -11,7 +11,7 @@ Use this checklist before a public release, paid API preview, or major docs upda
 
 - Public repos contain only open-source code, public interfaces, no-op stubs, and approved product wording.
 - Source-closed implementation code stays in private repos.
-- Public docs may name source-closed products, but must not include private source, private patch contents, credentials, local private paths, or operational details.
+- Public docs may describe public extension interfaces, but must not include private source, private patch contents, credentials, local private paths, unreleased product plans, or operational details.
 - Public history scan has been run for secrets and private-boundary terms.
 - Release artifacts do not include private docs, source patches, local overlays, debug symbols with sensitive paths, or secrets.
 
@@ -35,10 +35,10 @@ npm run build
 ## Product Copy
 
 - VulpineOS is positioned as the open-source browser-agent runtime.
-- Vulpine API is positioned as the source-closed hosted commercial API.
-- Vulpine Vault, AudioBridge, and iOS MobileBridge are described as commercial/source-closed surfaces.
+- Vulpine API is positioned as a hosted extraction surface without exposing private implementation detail.
+- Credential, audio, and mobile provider integrations are described as extension seams with graceful unavailable behavior in public builds.
 - Vulpine Mark, Android MobileBridge, Foxbridge, and VulpineOS are described as open-source surfaces.
-- Planned products are described as roadmap items, not shipped functionality.
+- Unreleased products and private roadmap detail are absent from public docs.
 
 ## Visual Review
 

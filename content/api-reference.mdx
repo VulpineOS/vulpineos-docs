@@ -1,11 +1,11 @@
 ---
 title: "Vulpine API Reference"
-description: "Vulpine API endpoint reference for extraction, authenticated and visual workflows, audio capture and transcription, mobile sessions, async tasks, monitors, and account operations."
+description: "Vulpine API endpoint reference for extraction, visual workflows, audio capture and transcription, mobile sessions, async tasks, monitors, and account operations."
 ---
 
 # Vulpine API Reference
 
-Vulpine API is the hosted commercial API for VulpineOS browser extraction. It uses real browser sessions when available, falls back to HTTP fetches where appropriate, and returns structured JSON with usage metadata.
+Vulpine API is the hosted API for VulpineOS browser extraction. It uses real browser sessions when available, falls back to HTTP fetches where appropriate, and returns structured JSON with usage metadata.
 
 Base URL:
 
@@ -199,7 +199,7 @@ Use this when the target is behind login and the tenant has a stored credential 
 }
 ```
 
-This endpoint requires a paid plan plus private vault/browser wiring.
+This endpoint requires credential-provider and browser-session support in the deployment.
 
 Mobile session leases are persisted. Session responses may include `expires_at`, `released_at`, and `updated_at`. After an API restart, previously attached worker-local sessions are reconciled to `expired` so stale loopback endpoints are not shown as live sessions.
 
@@ -227,7 +227,7 @@ Returns labeled screenshot data plus structured visual element metadata for brow
 }
 ```
 
-This endpoint requires a paid plan and browser integration.
+This endpoint requires browser integration in the deployment.
 
 ## Batch
 
@@ -297,7 +297,7 @@ Download the retained artifact after stop:
 GET /v1/audio/captures/{id}/content
 ```
 
-These endpoints require a paid plan and private AudioBridge wiring. Audio capture metadata is persisted so completed or interrupted artifacts remain listable and downloadable after API restarts until retention cleanup removes them.
+These endpoints require an audio-capture provider in the deployment. Audio capture metadata is persisted so completed or interrupted artifacts remain listable and downloadable after API restarts until retention cleanup removes them.
 
 ## Audio Transcription
 
@@ -558,7 +558,7 @@ Delete a monitor:
 DELETE /v1/monitors/{id}
 ```
 
-Current monitor scheduling enqueues recurring extraction jobs. Change detection, condition evaluation, and richer webhook change payloads are tracked separately in the paid API backlog.
+Current monitor scheduling enqueues recurring extraction jobs. Change detection, condition evaluation, and richer webhook change payloads may vary by deployment.
 
 ## Errors
 
@@ -612,6 +612,6 @@ result = client.extract(ExtractRequest(
 
 ## See also
 
-- [Vulpine API Features](/api-features) — product surface and planned endpoint families
-- [Source Availability](/source-availability) — open-source and source-closed boundaries
+- [Vulpine API Features](/api-features) — hosted extraction surface
+- [Source Availability](/source-availability) — open-source and extension boundaries
 - [MCP Browser Tools](/mcp-tools) — local agent/browser control tools

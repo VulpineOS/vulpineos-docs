@@ -1,11 +1,11 @@
 ---
-title: "Vulpine API — Hosted Browser Extraction and Commercial Surfaces"
-description: "Hosted extraction API built on the VulpineOS runtime, with authenticated workflows, visual extraction, monitors, browser artifacts, and source-closed commercial extensions."
+title: "Vulpine API — Hosted Browser Extraction"
+description: "Hosted extraction API built on the VulpineOS runtime, with browser-backed extraction, visual artifacts, monitors, and operator history."
 ---
 
 # Vulpine API
 
-Vulpine API is the hosted commercial surface for teams that want browser-backed extraction, authenticated workflows, visual extraction, and recurring monitors without operating their own browser fleet.
+Vulpine API is the hosted surface for teams that want browser-backed extraction, visual workflows, and recurring monitors without operating their own browser fleet.
 
 <div style={{ margin: '1.5rem 0 2rem' }}>
   <img src="/media/vulpine-mark-annotated.png" alt="Visual extraction and annotated browser output" style={{ width: '100%', borderRadius: '10px', border: '1px solid #26263a' }} />
@@ -17,8 +17,8 @@ Vulpine API is the hosted commercial surface for teams that want browser-backed 
     <div style={{ fontWeight: 700 }}>Structured browser-backed extraction with sync, async, and batch execution</div>
   </div>
   <div style={{ border: '1px solid #26263a', borderRadius: '8px', padding: '14px' }}>
-    <div style={{ fontSize: '12px', color: '#888', marginBottom: '6px' }}>Authenticated and visual flows</div>
-    <div style={{ fontWeight: 700 }}>Stored credential workflows, redacted traces, screenshots, annotated image retention</div>
+    <div style={{ fontSize: '12px', color: '#888', marginBottom: '6px' }}>Visual flows</div>
+    <div style={{ fontWeight: 700 }}>Screenshots, annotated image retention, and redacted traces</div>
   </div>
   <div style={{ border: '1px solid #26263a', borderRadius: '8px', padding: '14px' }}>
     <div style={{ fontSize: '12px', color: '#888', marginBottom: '6px' }}>Operations</div>
@@ -31,7 +31,6 @@ Vulpine API is the hosted commercial surface for teams that want browser-backed 
 | Workflow | What the hosted surface provides |
 |---|---|
 | Structured extraction | Browser-backed extraction from schema or natural-language prompts, with sync and async execution |
-| Authenticated extraction | Stored credential references, expiring saved sessions, and redacted auth traces for diagnosis |
 | Visual extraction | Screenshot-backed extraction plus retained annotated images for later operator review |
 | Monitoring | Repeated runs, change detection, webhook delivery, extraction history, retry/failure classification |
 | Operations | Usage, scoped API keys, provider listing, retained result and artifact downloads |
@@ -41,11 +40,9 @@ Vulpine API is the hosted commercial surface for teams that want browser-backed 
 | Area | Current surface |
 |---|---|
 | Extraction | `POST /v1/extract`, `POST /v1/batch`, task lookup, extraction history, result export |
-| Authenticated workflows | `POST /v1/extract/authenticated`, session listing/removal, redacted auth traces |
 | Visual workflows | `POST /v1/visual`, retained screenshot and annotated image downloads |
 | Monitors | Create, list, and delete recurring monitors |
 | Account and usage | Usage totals, provider listing, scoped key creation and listing |
-| Mobile and audio surfaces | Available when the corresponding commercial bridge/capture wiring is attached |
 
 ## Example
 
@@ -78,32 +75,14 @@ curl -X POST https://api.vulpineos.com/v1/extract \
 VulpineOS itself is public and self-hostable. The hosted API exists for teams that want:
 
 - browser-backed extraction without running the browser fleet
-- authenticated and visual workflows behind a stable service boundary
+- visual workflows behind a stable service boundary
 - retained artifacts and history for operators
-- commercial extensions such as Vault, AudioBridge, and iOS MobileBridge behind the same product line
 
-## Open Runtime, Commercial Surface
+## Open Runtime, Hosted Surface
 
-| Open source foundation | Hosted / source-closed surface |
-|---|---|
-| VulpineOS runtime | Vulpine API |
-| Foxbridge | Vulpine Vault |
-| Vulpine Mark | AudioBridge |
-| Android MobileBridge | iOS MobileBridge |
-
-The hosted API uses the same runtime family, but some higher-level product surfaces stay source-closed. Public docs name them and describe their capability boundaries, while implementation details stay out of the public repos.
-
-## Commercial Product Line
-
-| Product | Status | Public description |
-|---|---|---|
-| Vulpine API | Current | Hosted extraction, authenticated and visual workflows, monitors, usage, keys, and operations |
-| Vulpine Vault | Current commercial extension | Credential metadata, secure autofill, TOTP, and authenticated workflow support |
-| AudioBridge | Current commercial extension | Browser audio capture and transcription-oriented workflows |
-| MobileBridge for iOS | Current commercial extension | iOS device discovery and session support for managed environments |
-| Vulpine Sentinel | Roadmap | Fleet stealth health monitoring |
-| Vulpine Replay | Roadmap | Deterministic replay and audit bundles |
-| Vulpine Clockwork | Roadmap | Mid-session identity rotation |
+The hosted API uses the same public runtime family and public tool contracts.
+Provider implementations and deployment wiring are not part of the open-source
+runtime repository.
 
 ## Product Boundary
 
@@ -115,15 +94,8 @@ The public/open pieces are:
 - Android MobileBridge
 - public docs and API positioning
 
-The source-closed pieces are:
-
-- Vulpine API service implementation
-- Vault
-- AudioBridge
-- iOS MobileBridge
-- planned commercial products such as Sentinel, Replay, Clockwork, Prism, Pulse, Forge, Scribe, Harbor, Mesh, and Oracle
-
-See [Source Availability](/source-availability) for the exact boundary and [API Reference](/api-reference) for the endpoint-level contract.
+See [Source Availability](/source-availability) for the exact boundary and
+[API Reference](/api-reference) for the endpoint-level contract.
 
 ## Read Next
 

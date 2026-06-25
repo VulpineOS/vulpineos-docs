@@ -1,18 +1,18 @@
 ---
 title: "Docker Deployment — Vulpine-Box Container for VulpineOS"
-description: "Deploy VulpineOS in Docker with Vulpine-Box: container build inputs, access keys, volumes, remote panel access, and optional TLS."
+description: "Deploy VulpineOS in Docker with Vulpine-Box: container build inputs, access keys, volumes, web panel access, and optional TLS."
 ---
 
 # Docker Deployment — Vulpine-Box
 
-Vulpine-Box packages the VulpineOS runtime, OpenClaw, Camoufox, and an Xvfb display into a
+Vulpine-Box packages the VulpineOS runtime, Vulpine browser, and an Xvfb display into a
 single container. Use it when you want the browser kernel on a VPS and connect to it from
 your laptop through the web panel or the TUI.
 
 By default the container starts:
 
 ```bash
-./vulpineos serve --binary ./browser/camoufox --port 8443 --no-tls --api-key "$VULPINE_API_KEY"
+./vulpineos serve --binary ./browser/vulpine --port 8443 --no-tls --api-key "$VULPINE_API_KEY"
 ```
 
 That means the stock Docker path exposes the same served control plane as a normal
@@ -25,8 +25,8 @@ key.
 git clone https://github.com/VulpineOS/VulpineOS.git
 cd VulpineOS
 
-# Build or copy the Linux Camoufox distribution first.
-# The Dockerfile expects dist/camoufox-linux/ to exist.
+# Build or copy the Linux Vulpine browser distribution first.
+# The Dockerfile expects dist/vulpine-linux/ to exist.
 
 # Set an access key for the served runtime.
 export VULPINE_API_KEY=$(openssl rand -hex 32)
@@ -35,37 +35,37 @@ export VULPINE_API_KEY=$(openssl rand -hex 32)
 docker compose up -d
 ```
 
-Open the remote panel from your local machine:
+Open the web panel from your local machine:
 
 ```bash
-vulpineos remote panel --url http://your-vps:8443 --api-key $VULPINE_API_KEY
+open http://your-vps:8443
 ```
 
-Connect with the remote TUI instead:
+Connect with the remote TUI:
 
 ```bash
-vulpineos remote tui --url http://your-vps:8443 --api-key $VULPINE_API_KEY
+vulpineos remote --url http://your-vps:8443 --api-key $VULPINE_API_KEY
 ```
 
-`vulpineos remote` defaults to panel mode, so `vulpineos remote --url ...` also works.
+The web panel prompts for the same access key passed in as `VULPINE_API_KEY`.
 
 ## What You Need Before `docker compose up`
 
-`Dockerfile.vulpinebox` does **not** compile Camoufox. It copies a prebuilt browser bundle
-from `dist/camoufox-linux/` into the image at build time.
+`Dockerfile.vulpinebox` does **not** compile the browser. It copies a prebuilt browser bundle
+from `dist/vulpine-linux/` into the image at build time.
 
 Required layout:
 
 ```text
 VulpineOS/
   dist/
-    camoufox-linux/
-      camoufox
-      camoufox-bin
+    vulpine-linux/
+      vulpine
+      vulpine-bin
       ...other runtime files...
 ```
 
-If `dist/camoufox-linux/` is missing, the Docker build will fail.
+If `dist/vulpine-linux/` is missing, the Docker build will fail.
 
 ## Docker Compose
 
@@ -101,11 +101,11 @@ Default behavior:
 - `VULPINE_API_KEY` is passed through to `vulpineos serve`
 - the stock compose file serves **plain HTTP** on `8443`
 - the healthcheck hits `http://localhost:8443/health`
-- Xvfb provides a display so Camoufox can stay headful inside the container
+- Xvfb provides a display so the Vulpine browser can stay headful inside the container
 
 If you want HTTPS/WSS, mount certificates and provide `VULPINE_TLS_CERT` and
 `VULPINE_TLS_KEY`. Until then, connect with `http://...` URLs for the panel and let
-`vulpineos remote tui` normalize that to `ws://.../ws`.
+`vulpineos remote` normalizes that to `ws://.../ws`.
 
 ## Persistent Volumes
 
@@ -128,10 +128,9 @@ The multi-stage Dockerfile builds:
 2. **Stage 2** — Ubuntu 22.04 runtime with:
    - GTK/X11 libraries for Firefox rendering
    - Xvfb virtual display (headless)
-   - Pre-built Camoufox binary
-   - Node.js + OpenClaw
+   - Pre-built Vulpine browser binary
 
-The runtime image expects the browser executable at `./browser/camoufox`, matching the
+The runtime image expects the browser executable at `./browser/vulpine`, matching the
 entrypoint.
 
 ## Entrypoint
@@ -139,21 +138,15 @@ entrypoint.
 The `scripts/entrypoint.sh` script:
 
 1. Starts Xvfb on display `:99`
-2. Launches `vulpineos serve --binary ./browser/camoufox --port 8443 --no-tls`
+2. Launches `vulpineos serve --binary ./browser/vulpine --port 8443 --no-tls`
 3. Adds `--api-key "$VULPINE_API_KEY"` when that environment variable is set
 4. Replaces `--no-tls` with `--tls-cert` and `--tls-key` when both TLS environment variables are set
 
-The panel does not have a separate login database. The prompt in the remote panel is asking
+The panel does not have a separate login database. The prompt in the web panel is asking
 for the same access key passed in as `VULPINE_API_KEY`.
 
-If you connect with:
-
-```bash
-vulpineos remote panel --url http://your-vps:8443 --api-key $VULPINE_API_KEY
-```
-
-the generated URL includes the token, the panel validates it, stores it in session storage,
-and strips it from the visible URL after load.
+Open `http://your-vps:8443`, enter the access key, and the panel stores it only
+for the current browser session.
 
 ## Memory
 
@@ -180,13 +173,13 @@ environment:
 
 Once TLS is enabled:
 
-- use `https://your-vps:8443` with `vulpineos remote panel`
-- use the same `https://...` base URL with `vulpineos remote tui`
+- open `https://your-vps:8443` in your browser for the web panel
+- use the same `https://...` base URL with `vulpineos remote`
 - the remote TUI normalizes that base URL to `wss://.../ws`
 
 ## Known Limits
 
-- The image depends on a prebuilt Linux Camoufox distribution; the Docker build does not
+- The image depends on a prebuilt Linux Vulpine browser distribution; the Docker build does not
   produce one for you.
 - The stock compose file does not include TLS certificates.
 - `docker-compose.yml` requires `VULPINE_API_KEY`; generate one before launching the

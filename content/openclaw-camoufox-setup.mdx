@@ -1,26 +1,19 @@
 ---
-title: "OpenClaw + Camoufox Setup — Undetectable AI Browser Agents"
-description: "Run OpenClaw AI agents on Camoufox anti-detect browser with VulpineOS. Per-agent fingerprints, injection protection, and zero bot detection."
+title: "Vulpine Browser Agent Setup"
+description: "Run AI browser agents through VulpineOS with per-agent browser contexts, fingerprints, injection protection, and operator controls."
 ---
 
-# OpenClaw + Camoufox Setup
+# Vulpine Browser Agent Setup
 
-This guide covers setting up OpenClaw AI agents on Camoufox (anti-detect Firefox) via VulpineOS. The result: AI agents that browse the web with unique fingerprints, zero bot detection, and protection against prompt injection.
+This guide covers the current VulpineOS browser-agent path: one Vulpine browser process, isolated contexts per agent, MCP/Juggler browser tools, and an embedded foxbridge CDP endpoint for compatible clients.
 
-## Why Camoufox for AI Agents?
+## Why Vulpine Browser for AI Agents?
 
-OpenClaw's default browser is Chrome. Chrome is detected by every major anti-bot system:
+Chrome automation stacks often expose browser-level automation markers:
 
-| Anti-Bot System | Chrome Detection | Camoufox Detection |
-|-----------------|-----------------|-------------------|
-| Cloudflare | Immediate | Undetected |
-| DataDome | Immediate | Undetected |
-| PerimeterX | Immediate | Undetected |
-| Akamai | Immediate | Undetected |
-
-Camoufox evades detection because:
+Vulpine browser reduces that surface because:
 - `navigator.webdriver` is `false` at the C++ level (not a JavaScript override)
-- No automation markers (`$cdc_`, `HeadlessChrome`, etc.)
+- no Chromium automation markers (`$cdc_`, `HeadlessChrome`, etc.)
 - Per-context BrowserForge fingerprints (unique WebGL, canvas, audio, fonts)
 - Real browser engine (Firefox 146.0.1), not a patched Chromium
 
@@ -28,18 +21,15 @@ Camoufox evades detection because:
 
 ### Option 1: VulpineOS (Recommended)
 
-VulpineOS bundles everything — Camoufox, foxbridge CDP proxy, agent management, security:
+VulpineOS bundles the browser runtime, foxbridge CDP proxy, agent management, and security features:
 
 ```bash
-git clone https://github.com/VulpineOS/VulpineOS.git
-cd VulpineOS
-make fetch && make setup && make dir && make build
-go build -o vulpineos ./cmd/vulpineos
-./vulpineos
+curl -fsSL https://vulpineos.com/install | bash
+vulpineos
 ```
 
 VulpineOS automatically:
-- Launches Camoufox with the embedded foxbridge CDP server
+- Launches the Vulpine browser with the embedded foxbridge CDP server
 - Creates isolated contexts with unique fingerprints per agent
 - Filters hidden DOM for injection protection
 - Manages agent lifecycles, costs, and sessions
@@ -52,11 +42,11 @@ If you want just the CDP bridge without VulpineOS management:
 # Install foxbridge
 go install github.com/VulpineOS/foxbridge/cmd/foxbridge@latest
 
-# Start with Camoufox
-foxbridge --binary /path/to/camoufox --port 9222 --headless
+# Start with Vulpine browser
+foxbridge --binary /path/to/vulpine --port 9222 --headless
 ```
 
-Configure OpenClaw:
+Configure any CDP-compatible client to use the foxbridge endpoint:
 ```json
 {
   "browser": {
@@ -89,12 +79,12 @@ VulpineOS Go Binary
   ├── Context Pool (pre-warmed, max 20 concurrent)
   ├── Vault (SQLite — identities, cookies, sessions)
   ├── Embedded Foxbridge CDP (:9222)
-  │     └── OpenClaw connects here
-  └── Camoufox (single process)
+  │     └── CDP-compatible clients connect here
+  └── Vulpine browser (single process)
         └── Per-agent contexts with unique fingerprints
 ```
 
-One Camoufox process serves all agents. Each agent gets an isolated context with its own cookies, storage, and fingerprint. Memory usage: ~10-15MB per context vs Chrome's 50-80MB.
+One Vulpine browser process serves all agents. Each agent gets an isolated context with its own cookies, storage, and fingerprint. Memory usage is roughly 10-15MB per context.
 
 ## Security
 

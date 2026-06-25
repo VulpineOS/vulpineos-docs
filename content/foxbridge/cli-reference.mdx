@@ -10,7 +10,7 @@ description: "Foxbridge CLI flags: --binary, --port, --backend, --headless, --bi
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--port` | `9222` | CDP WebSocket server port |
-| `--binary` | auto-detect | Path to Firefox or Camoufox binary |
+| `--binary` | auto-detect | Path to Firefox, Vulpine, or legacy Camoufox binary |
 | `--headless` | `false` | Run browser in headless mode |
 | `--profile` | — | Firefox profile directory |
 | `--backend` | `juggler` | Backend protocol: `juggler` or `bidi` |
@@ -19,16 +19,16 @@ description: "Foxbridge CLI flags: --binary, --port, --backend, --headless, --bi
 
 ## Examples
 
-### Basic usage with Camoufox
+### Basic usage with Vulpine browser
 
 ```bash
-foxbridge --binary ~/.camoufox/camoufox --port 9222
+foxbridge --binary /path/to/vulpine --port 9222
 ```
 
 ### Headless mode
 
 ```bash
-foxbridge --binary /path/to/camoufox --headless --port 9222
+foxbridge --binary /path/to/vulpine --headless --port 9222
 ```
 
 ### BiDi backend with auto-launch
@@ -48,7 +48,7 @@ foxbridge --backend bidi --bidi-url ws://localhost:9223/session --port 9222
 ### Custom profile directory
 
 ```bash
-foxbridge --binary /path/to/camoufox --profile /tmp/foxbridge-profile --port 9222
+foxbridge --binary /path/to/vulpine --profile /tmp/foxbridge-profile --port 9222
 ```
 
 ## HTTP Endpoints
@@ -63,11 +63,11 @@ foxbridge --binary /path/to/camoufox --profile /tmp/foxbridge-profile --port 922
 
 ## Binary Detection
 
-If `--binary` is not specified, foxbridge searches for Firefox/Camoufox in this order:
+If `--binary` is not specified, foxbridge searches for Vulpine, Firefox, and legacy Camoufox names in this order:
 
-1. `./camoufox` or `./firefox` (current directory)
-2. `~/.camoufox/camoufox`
-3. System PATH (`which firefox` / `which camoufox`)
+1. `./vulpine`, `./camoufox`, or `./firefox` (current directory)
+2. common VulpineOS and legacy Camoufox install paths
+3. System PATH (`which vulpine`, `which firefox`, `which camoufox`)
 
 ## Testing
 

@@ -87,16 +87,13 @@ Agent JavaScript evaluations run in a restricted sandbox:
 | Page freeze | nsDocShell suspend | None | None |
 | DOM monitoring | MutationObserver + signatures | None | None |
 | Sandboxed eval | Blocked network APIs | Full access | None |
-| Detection evasion | Camoufox fingerprints | Detectable | N/A |
+| Detection evasion | Vulpine browser fingerprints | Detectable | N/A |
 
 ## Getting Started
 
 ```bash
-git clone https://github.com/VulpineOS/VulpineOS.git
-cd VulpineOS
-make fetch && make setup && make dir && make build
-go build -o vulpineos ./cmd/vulpineos
-./vulpineos
+curl -fsSL https://vulpineos.com/install | bash
+vulpineos
 ```
 
 The injection filter is enabled by default. Action Lock and other security features can be configured via the TUI settings or web panel.

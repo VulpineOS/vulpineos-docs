@@ -47,8 +47,8 @@ export default {
   },
   'ai-browser-agent-security': 'AI Agent Security',
   'prevent-prompt-injection': 'Prevent Prompt Injection',
-  'openclaw-camoufox-setup': 'OpenClaw + Camoufox Setup',
-  'camoufox-vs-chrome': 'Camoufox vs Chrome',
+  'openclaw-camoufox-setup': 'Vulpine Browser Setup',
+  'camoufox-vs-chrome': 'Vulpine Browser vs Chrome',
   '---dev': {
     title: 'Development',
     type: 'separator',

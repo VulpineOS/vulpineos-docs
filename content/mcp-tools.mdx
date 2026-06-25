@@ -1,17 +1,17 @@
 ---
-title: "MCP Browser Tools — 36 Tools for AI Agent Browser Control"
-description: "VulpineOS MCP tools: browser control, reliability checks, human-like actions, annotated screenshots, credential, audio, and Android mobile bridge tools for OpenClaw agents."
+title: "MCP Browser Tools — 38 Tools for AI Agent Browser Control"
+description: "VulpineOS MCP tools: browser control, reliability checks, human-like actions, annotated screenshots, credential, audio, and Android mobile bridge tools for AI browser agents."
 ---
 
 # MCP Tools
 
-VulpineOS provides a [Model Context Protocol](https://spec.modelcontextprotocol.io/) (MCP) server that exposes browser automation as tool calls. Each AI browser agent uses these tools to browse — every action goes through the anti-detect browser engine (Camoufox). OpenClaw agents call these tools directly for all browser automation tasks.
+VulpineOS provides a [Model Context Protocol](https://spec.modelcontextprotocol.io/) (MCP) server that exposes browser automation as tool calls. Each AI browser agent uses these tools to browse, and every action routes through the selected Vulpine browser context.
 
 ```bash
 ./vulpineos mcp
 ```
 
-## Available Tools (36)
+## Available Tools (38)
 
 ### Core Browser Control
 
@@ -23,12 +23,14 @@ VulpineOS provides a [Model Context Protocol](https://spec.modelcontextprotocol.
 | `vulpine_type` | Type into the focused element |
 | `vulpine_screenshot` | Capture a base64 PNG screenshot |
 | `vulpine_scroll` | Scroll by pixel delta |
+| `vulpine_scroll_into_view` | Scroll a selector or ref into view |
 | `vulpine_new_context` | Create an isolated browser context and page |
 | `vulpine_close_context` | Close a browser context |
 | `vulpine_get_ax_tree` | Read the injection-filtered accessibility tree |
 | `vulpine_click_ref` | Click by `@ref` from `vulpine_snapshot` |
 | `vulpine_type_ref` | Focus and type by `@ref` |
 | `vulpine_hover_ref` | Hover by `@ref` |
+| `vulpine_element_status` | Inspect visibility, enabled state, text, and geometry for a selector or ref |
 
 `vulpine_snapshot` is the primary page-reading tool. It returns compressed DOM with element refs:
 
@@ -148,7 +150,7 @@ Human-realism tools are useful when the task should look less mechanical:
 
 ### Extension Surfaces
 
-These tools expose stable VulpineOS feature surfaces. Open-source builds return graceful unavailable errors when a provider is not present; commercial/private builds can attach their own providers without exposing implementation source.
+These tools expose stable VulpineOS feature surfaces. Open-source builds return graceful unavailable errors when a provider is not present; provider-enabled builds can attach implementations behind the same public tool names.
 
 | Tool | Description |
 |------|-------------|
@@ -207,7 +209,7 @@ Audio tools use capture handles:
 { "name": "vulpine_stop_audio_capture", "arguments": { "handle_id": "audio-1" } }
 ```
 
-Mobile bridge tools expose Android bridge sessions in open-source builds and can share the same public API surface with commercial providers:
+Mobile bridge tools expose Android bridge sessions in open-source builds and can share the same public API surface with other provider-enabled deployments:
 
 ```json
 {
@@ -245,9 +247,11 @@ This is more reliable than coordinate-based clicking because refs resolve to the
 
 The MCP server tracks repeated identical tool calls. After repeated no-progress calls, it returns a warning telling the agent to reassess with `vulpine_find`, `vulpine_verify`, or `vulpine_page_info`. Navigation resets the loop history.
 
-## OpenClaw Integration
+## Agent Runtime Integration
 
-VulpineOS auto-generates `~/.openclaw-vulpine/openclaw.json`. When foxbridge is available, it sets `browser.cdpUrl` so OpenClaw uses its native CDP browser tools through Camoufox:
+VulpineOS prepares a local agent workspace and routes browser work through its
+MCP/Juggler tools. Foxbridge can also expose a CDP endpoint for compatible
+clients that expect a Chrome DevTools Protocol URL:
 
 ```json
 {
@@ -264,5 +268,5 @@ VulpineOS auto-generates `~/.openclaw-vulpine/openclaw.json`. When foxbridge is 
 
 - [Getting Started](/getting-started) — install and launch your first agent
 - [Token-Optimized DOM Export](/optimized-dom) — compressed snapshots for LLM context
-- [Foxbridge CDP Proxy](/foxbridge) — embedded CDP server for OpenClaw
+- [Foxbridge CDP Proxy](/foxbridge) — embedded CDP server for compatible clients
 - [Agent Scripting DSL](/agent-scripting) — JSON automation without LLM calls

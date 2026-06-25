@@ -1,23 +1,33 @@
 ---
 title: "Getting Started with VulpineOS — Install and Launch AI Browser Agents"
-description: "Install VulpineOS, build the browser engine, and launch your first OpenClaw AI browser agent in minutes."
+description: "Install VulpineOS, configure a model provider, and launch your first AI browser agent in minutes."
 ---
 
 # Getting Started
 
-This guide walks you through installing VulpineOS and launching your first AI browser agent. VulpineOS is an anti-detect browser built for browser automation at scale — each agent gets a unique fingerprint, isolated context, and prompt injection protection out of the box.
+This guide walks you through installing VulpineOS and launching your first AI browser agent. VulpineOS combines a hardened Vulpine browser runtime with a local TUI, web panel, remote control plane, and browser tools for agents.
 
 ## Prerequisites
 
 - **macOS** (Apple Silicon or Intel) or **Linux** (x86_64)
-- **Go 1.26+** — for building the TUI binary
-- **Node.js 22.16+** — for OpenClaw agent runtime
-- **Python 3.10+** — for full fingerprint generation (optional, falls back to built-in profiles)
-- **Make** — build orchestration
+- **Python 3**, `unzip`, and either `curl` or `wget` for the installer
+- **Go 1.26+** only when building the runtime from source
+- **Python 3.10+** and `make` only when rebuilding the browser engine
 
 ## Installation
 
-### Option 1: Build from Source
+### Option 1: One-Line Install
+
+```bash
+curl -fsSL https://vulpineos.com/install | bash
+vulpineos
+```
+
+The installer downloads the latest published `vulpineos` CLI and matching
+Vulpine browser bundle for your platform, installs the CLI onto your PATH, and
+records the browser path in `~/.vulpineos/config.json`.
+
+### Option 2: Build from Source
 
 ```bash
 git clone https://github.com/VulpineOS/VulpineOS.git
@@ -31,12 +41,13 @@ make build     # Compile (artifact builds: ~5 min on M1)
 
 # Build the Go binary
 go build -o vulpineos ./cmd/vulpineos
-
-# Install OpenClaw
-npm install
 ```
 
-### Option 2: Docker (Vulpine-Box)
+Source builds need a Vulpine-compatible browser binary. Use the browser build
+above, place a packaged Vulpine bundle next to `./vulpineos`, or pass one
+explicitly with `--binary /path/to/vulpine`.
+
+### Option 3: Docker (Vulpine-Box)
 
 ```bash
 git clone https://github.com/VulpineOS/VulpineOS.git
@@ -47,7 +58,7 @@ docker compose up -d
 
 Then connect from any machine:
 ```bash
-vulpineos remote tui --url http://your-server:8443 --api-key $VULPINE_API_KEY
+vulpineos remote --url http://your-server:8443 --api-key $VULPINE_API_KEY
 ```
 
 ## First Run
@@ -55,21 +66,16 @@ vulpineos remote tui --url http://your-server:8443 --api-key $VULPINE_API_KEY
 Launch the local TUI:
 
 ```bash
+vulpineos
+# or, from a source build:
 ./vulpineos
-# or
-./vulpineos tui
 ```
 
-Launch the local panel instead:
+Launch without a browser for configuration or layout checks:
 
 ```bash
-./vulpineos panel
+vulpineos --no-browser
 ```
-
-`vulpineos panel` binds to `127.0.0.1`, prints a direct panel URL, and opens
-the browser when possible. If no `--api-key` is provided, VulpineOS generates a
-session access key and includes it in the printed panel URL so the panel can
-log in directly.
 
 On first launch, the **setup wizard** appears:
 
@@ -77,41 +83,37 @@ On first launch, the **setup wizard** appears:
 2. **Enter API Key** — Paste your API key for the selected provider
 3. **Choose Model** — Pick the model to power your agents
 
-The wizard saves configuration to `~/.vulpineos/config.json` and generates
-`~/.openclaw-vulpine/openclaw.json` automatically.
+The wizard saves configuration to `~/.vulpineos/config.json` and prepares the
+local agent runtime workspace automatically.
 
 ## Creating Your First Agent
 
 Once in the TUI workbench:
 
-1. Press **`n`** to create a new agent
-2. Type a name and press **Enter**
-3. Type a task description (e.g., "Search for the latest AI news on Hacker News")
-4. Press **Enter** — the agent spawns and begins working
+1. Type a task directly in the chat input.
+2. Use `/new` when you want to create another agent.
+3. Use `/agents` to open the agent picker.
+4. Click an agent in the left column to switch conversations.
 
 The center panel shows the agent's conversation in real-time. The right panel shows its browser contexts, token usage, and fingerprint profile.
 
-## Key Bindings
+## Main Controls
 
-| Key | Action |
-|-----|--------|
-| `n` | New agent |
-| `j` / `k` | Navigate agent list |
-| `Enter` | Send message to agent |
-| `p` | Pause agent |
-| `r` | Resume agent |
-| `x` | Delete agent |
-| `Shift+S` | Open settings |
-| `c` | Reconfigure provider/model |
-| `Tab` | Cycle focus between panels |
-| `q` | Quit |
+- Type in the chat input and press `Enter` to send.
+- Type `/` to open the command palette.
+- Use `↑`/`↓` and `Enter` to choose a command.
+- Use `Esc` to close menus or cancel selection.
+- Click agent rows to switch agents.
+- Use the mouse wheel over the chat or agent list to scroll.
+- Use `/settings`, `/config`, `/view`, `/hide`, `/log`, `/trace`, `/copy`, and `/quit` for workbench actions.
+- `Ctrl+C` remains an emergency quit path.
 
 ## Demo Mode
 
 To explore the TUI without launching the browser engine:
 
 ```bash
-./vulpineos --no-browser
+vulpineos --no-browser
 ```
 
 This runs the full interface with simulated data — useful for testing layouts or developing new panels.
@@ -125,20 +127,14 @@ Expose a server with the web panel and remote control API:
 ```
 
 If `--api-key` is omitted, VulpineOS generates one at startup and prints both
-the access key and a direct panel URL containing the token.
+the access key and a direct panel URL.
 
-Open a remote panel from another machine:
-
-```bash
-./vulpineos remote --url http://your-server:8443 --api-key YOUR_KEY
-# or explicitly:
-./vulpineos remote panel --url http://your-server:8443 --api-key YOUR_KEY
-```
+Open the printed panel URL in a browser from another machine.
 
 Connect the remote TUI:
 
 ```bash
-./vulpineos remote tui --url http://your-server:8443 --api-key YOUR_KEY
+./vulpineos remote --url http://your-server:8443 --api-key YOUR_KEY
 ```
 
 ## Next Steps
@@ -152,6 +148,6 @@ Connect the remote TUI:
 ## See also
 
 - [Architecture](/architecture) — single-process runtime overview
-- [MCP Browser Tools](/mcp-tools) — 36 tools for AI agent browser control
+- [MCP Browser Tools](/mcp-tools) — 38 tools for AI agent browser control
 - [TUI Workbench](/tui) — terminal dashboard for managing agents
 - [Docker Deployment](/docker) — one-click Vulpine-Box container

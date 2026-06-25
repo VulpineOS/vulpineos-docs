@@ -34,10 +34,10 @@ const mcpSource = [
   readFileSync(join(vulpineosRoot, 'internal/mcp/extension_tools.go'), 'utf8'),
 ].join('\n')
 const mcpTools = new Set([...mcpSource.matchAll(/Name:\s+"(vulpine_[^"]+)"/g)].map(match => match[1]))
-const panelAPI = readFileSync(join(vulpineosRoot, 'internal/remote/api.go'), 'utf8')
+const panelAPI = readFileSync(join(vulpineosRoot, 'internal/remote/control.go'), 'utf8')
 const handleMessageBody = panelAPI.slice(
-  panelAPI.indexOf('func (api *PanelAPI) HandleMessage'),
-  panelAPI.indexOf('// ---------------------------------------------------------------------------\n// Agent management'),
+  panelAPI.indexOf('func (api *ControlAPI) HandleMessage'),
+  panelAPI.indexOf('default:'),
 )
 const panelMessages = new Set([...handleMessageBody.matchAll(/case "([^"]+)":/g)].map(match => match[1]))
 

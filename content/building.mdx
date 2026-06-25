@@ -5,14 +5,13 @@ description: "Build VulpineOS: fetch Firefox source, apply C++ patches, compile 
 
 # Building VulpineOS from Source
 
-VulpineOS is a fork of [Camoufox](https://github.com/daijro/camoufox), itself based on Firefox 146.0.1. The build system uses Make targets that orchestrate Firefox's `mach` build tool.
+VulpineOS builds a Vulpine-branded Firefox 146.0.1 browser from the Camoufox line, plus a Go runtime for the TUI, web panel, remote server, and MCP tools. The browser build system uses Make targets that orchestrate Firefox's `mach` build tool.
 
 ## Prerequisites
 
 - **macOS** (Apple Silicon or Intel) or **Linux** (x86_64)
 - **Python 3.10+** — required by Firefox's mach build system
-- **Go 1.26+** — for the TUI binary
-- **Node.js 22.16+** — for OpenClaw
+- **Go 1.26+** — for the VulpineOS runtime binary
 - ~40 GB disk space for the Firefox source tree + build artifacts
 
 ### macOS Additional
@@ -57,7 +56,7 @@ This runs `scripts/patch.py` to apply all unified diffs from `patches/` and `scr
 
 Key patches:
 - `action-lock.patch` — C++ page freeze (`nsDocShell`)
-- Camoufox fingerprinting patches (inherited)
+- Vulpine browser fingerprinting patches inherited from the Camoufox line
 
 Key additions:
 - `additions/juggler/` — the entire Juggler automation layer
@@ -72,23 +71,15 @@ make build
 
 Runs `./mach build` inside the Firefox source tree. On Apple Silicon with artifact builds enabled, this takes roughly 5 minutes. Full builds on Linux take 30-60 minutes.
 
-### 5. Build the Go Binary
+### 5. Build the Go Runtime
 
 ```bash
 go build -o vulpineos ./cmd/vulpineos
 ```
 
-Produces a ~11 MB binary with the full TUI, remote connectivity, MCP server, and orchestrator.
+Produces the `vulpineos` binary with the full TUI, web panel, remote connectivity, MCP server, and agent runtime orchestration.
 
-### 6. Install OpenClaw
-
-```bash
-npm install
-```
-
-Installs OpenClaw as a dependency (configured in the repo's `package.json`).
-
-### 7. Package (macOS)
+### 6. Package (macOS)
 
 ```bash
 make package-macos
@@ -103,12 +94,11 @@ VulpineOS/
 ├── patches/           # Unified diffs applied to Firefox source
 ├── additions/         # New files copied into Firefox source tree
 │   └── juggler/       # Playwright wire protocol + VulpineOS services
-├── settings/          # Preferences (camoufox.cfg) and branding
+├── settings/          # Preferences (vulpine.cfg) and branding
 ├── scripts/           # Build orchestration (patch.py, copy-additions.sh)
 ├── cmd/vulpineos/     # Go CLI entry point
 ├── internal/          # Go packages (TUI, kernel, vault, pool, etc.)
 ├── go.mod
-├── package.json       # OpenClaw dependency
 └── Makefile
 ```
 

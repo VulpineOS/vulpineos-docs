@@ -1,6 +1,6 @@
 ---
 title: "Foxbridge Quick Start — CDP Proxy for Firefox in VulpineOS"
-description: "Get started with foxbridge inside VulpineOS. Embedded mode shares a single Camoufox instance."
+description: "Get started with foxbridge inside VulpineOS. Embedded mode shares a single Vulpine browser instance."
 ---
 
 # Quick Start
@@ -22,10 +22,10 @@ go build -o foxbridge ./cmd/foxbridge/
 ## Run with Juggler (Default)
 
 ```bash
-foxbridge --binary /path/to/camoufox --port 9222
+foxbridge --binary /path/to/vulpine --port 9222
 ```
 
-Foxbridge launches Camoufox, connects via Juggler pipe, and starts a CDP WebSocket server on port 9222.
+Foxbridge launches Vulpine browser, connects via Juggler pipe, and starts a CDP WebSocket server on port 9222.
 
 ## Run with BiDi
 
@@ -53,9 +53,9 @@ await page.screenshot({ path: 'screenshot.png' });
 await browser.close();
 ```
 
-## Connect OpenClaw
+## Connect a CDP Client
 
-In your OpenClaw config (`~/.openclaw-vulpine/openclaw.json`):
+Point a CDP-compatible client at the foxbridge WebSocket:
 
 ```json
 {
@@ -66,7 +66,8 @@ In your OpenClaw config (`~/.openclaw-vulpine/openclaw.json`):
 }
 ```
 
-VulpineOS sets this automatically when foxbridge is available.
+VulpineOS starts embedded foxbridge automatically when the runtime path needs a
+CDP endpoint.
 
 ## HTTP Discovery
 

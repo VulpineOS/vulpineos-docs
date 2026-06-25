@@ -1,14 +1,14 @@
 ---
-title: "Remote Access — Deploy VulpineOS on a VPS with Panel and TUI"
-description: "VulpineOS remote deployment: serve mode, access-key authentication, remote panel links, and remote TUI connections."
+title: "Remote Access — Deploy VulpineOS on a VPS"
+description: "VulpineOS remote deployment: serve mode, access-key authentication, hosted web panel, and remote TUI connections."
 ---
 
 # Remote Access — Deploy VulpineOS on a VPS
 
 VulpineOS supports running the browser kernel on one machine and controlling it
-from another. The remote control plane has two operator modes:
+from another. The served control plane exposes:
 
-- **Remote panel** — open the embedded browser dashboard in your local browser
+- **Web panel** — open the embedded browser dashboard in your local browser
 - **Remote TUI** — run the terminal workbench against the remote runtime
 
 ## Three Modes
@@ -39,27 +39,21 @@ This starts:
 If `--api-key` is omitted, VulpineOS generates one at startup and prints both
 the access key and a direct panel URL containing the token.
 
-### 3. Remote Panel
+### 3. Web Panel
 
-Open the remote panel in your local browser:
-
-```bash
-./vulpineos remote --url http://your-vps:8443 --api-key YOUR_SECRET_KEY
-# or explicitly:
-./vulpineos remote panel --url http://your-vps:8443 --api-key YOUR_SECRET_KEY
-```
-
-If you omit the explicit remote mode, `panel` is the default.
+Open the panel URL printed by `vulpineos serve` in your local browser. The panel
+validates the access key through `/auth/check` and uses the same `/ws` endpoint
+as the remote TUI.
 
 ### 4. Remote TUI
 
 Connect the terminal workbench to a remote runtime:
 
 ```bash
-./vulpineos remote tui --url http://your-vps:8443 --api-key YOUR_SECRET_KEY
+./vulpineos remote --url http://your-vps:8443 --api-key YOUR_SECRET_KEY
 ```
 
-The TUI behaves identically to local mode — all panels, keybinds, and agent
+The TUI behaves identically to local mode — all panels, controls, and agent
 management work the same way. The WebSocket transport replaces the local pipe
 transport.
 
@@ -71,9 +65,8 @@ Access-key authentication supports two methods:
 - **Query parameter:** `?token=YOUR_KEY`
 
 Keys are compared using constant-time comparison to prevent timing attacks.
-The browser login form validates explicit keys through `/auth/check`, while the
-panel websocket continues to use the tokenized URL path required by browser
-WebSocket clients.
+The browser login form validates explicit keys through `/auth/check`, and the
+panel websocket authenticates with the same access key.
 
 ## Relay Protocol
 

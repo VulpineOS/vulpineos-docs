@@ -1,6 +1,6 @@
 ---
 title: "Foxbridge — Embedded CDP Proxy in VulpineOS"
-description: "Foxbridge CDP-to-Firefox proxy embedded in VulpineOS. OpenClaw controls Camoufox as if it were Chrome."
+description: "Foxbridge CDP-to-Firefox proxy embedded in VulpineOS. CDP-compatible clients can control Vulpine browser through a Chrome DevTools Protocol endpoint."
 ---
 
 # Foxbridge CDP Proxy
@@ -20,23 +20,23 @@ Foxbridge translates Chrome DevTools Protocol (CDP) into Firefox's Juggler and W
 
 In VulpineOS, foxbridge runs as an **embedded CDP server** — not a separate process. It wraps the kernel's Juggler client directly:
 
-- **One Camoufox process** shared between TUI, MCP tools, and OpenClaw agents
+- **One Vulpine browser process** shared between TUI, MCP tools, and compatible CDP clients
 - **Shared browser contexts** — fingerprints and cookies persist across all interfaces
 - **Zero overhead** — no second Firefox instance
 
 ```
-Kernel → Camoufox (single process) → Juggler pipe → juggler.Client
+Kernel → Vulpine browser (single process) → Juggler pipe → juggler.Client
   ├── TUI (direct Juggler calls)
-  ├── MCP server (36 tools)
+  ├── MCP server (38 tools)
   └── Embedded foxbridge CDP on :9222
-       └── OpenClaw connects via cdpUrl
+       └── CDP-compatible clients connect here
 ```
 
 ## Test Results
 
 | Backend | Tests | Status |
 |---------|-------|--------|
-| Juggler (Camoufox 146) | 74/74 | 100% |
+| Juggler (Vulpine/Firefox 146) | 74/74 | 100% |
 | BiDi (Firefox 148) | 62/62 | 100% |
 | Go unit tests | 285+ | Passing |
 

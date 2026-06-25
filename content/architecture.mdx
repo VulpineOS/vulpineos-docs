@@ -1,6 +1,6 @@
 ---
 title: "VulpineOS Architecture — Single-Process AI Agent Runtime"
-description: "VulpineOS architecture: Go binary with 38 packages, embedded foxbridge CDP, Camoufox browser engine, orchestrator, vault, and context pool."
+description: "VulpineOS architecture: Go binary with browser orchestration, embedded foxbridge CDP, Vulpine browser engine, vault, context pool, TUI, web panel, and MCP tools."
 ---
 
 # VulpineOS Architecture
@@ -21,14 +21,14 @@ VulpineOS is a vertically integrated stack: a hardened Firefox engine at the bot
 │  ┌──────────────▼──────────────────────────────┐  │
 │  │  Orchestrator                               │  │
 │  │  ┌──────────┬──────────┬─────────────────┐  │  │
-│  │  │ Pool     │ Vault    │ OpenClaw Mgr    │  │  │
+│  │  │ Pool     │ Vault    │ Agent Runtime   │  │  │
 │  │  │ (contexts)│ (SQLite) │ (agent procs)  │  │  │
 │  │  └──────────┴──────────┴─────────────────┘  │  │
 │  └──────────────┬──────────────────────────────┘  │
 │                 │ Juggler (FD 3/4 pipe)           │
 ├─────────────────┼────────────────────────────────┤
 │  ┌──────────────▼──────────────────────────────┐  │
-│  │  Camoufox (Firefox 146.0.1)                 │  │
+│  │  Vulpine Browser (Firefox 146.0.1)          │  │
 │  │                                              │  │
 │  │  ┌──────────────────────────────────┐        │  │
 │  │  │  Juggler (automation layer)      │        │  │
@@ -65,9 +65,9 @@ SQLite database at `~/.vulpineos/vault.db` storing:
 - **Templates** — reusable SOPs (Standard Operating Procedures) for agents
 - **Nomad Sessions** — ephemeral throwaway identities
 
-## OpenClaw Integration
+## Agent Runtime Integration
 
-OpenClaw agents connect to the browser through VulpineOS's MCP (Model Context Protocol) server. The MCP server translates tool calls like `vulpine_snapshot` and `vulpine_click` into Juggler protocol messages. This replaces Chrome entirely — agents use Camoufox without knowing it.
+Agents connect to the browser through VulpineOS's MCP (Model Context Protocol) server and native runtime integration. The MCP server translates tool calls like `vulpine_snapshot` and `vulpine_click` into Juggler protocol messages, so browser work stays inside the selected Vulpine browser context.
 
 ## Remote Architecture
 
@@ -83,6 +83,6 @@ The remote relay multiplexes Juggler messages, control commands, and TUI state u
 ## See also
 
 - [Getting Started](/getting-started) — install and launch your first agent
-- [Foxbridge CDP Proxy](/foxbridge) — embedded CDP server for OpenClaw
-- [MCP Browser Tools](/mcp-tools) — 36 tools for AI agent browser control
+- [Foxbridge CDP Proxy](/foxbridge) — embedded CDP server for compatible clients
+- [MCP Browser Tools](/mcp-tools) — 38 tools for AI agent browser control
 - [Build from Source](/building) — compile VulpineOS from Firefox patches

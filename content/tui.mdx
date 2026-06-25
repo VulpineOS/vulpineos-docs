@@ -32,7 +32,7 @@ VulpineOS ships a terminal-based workbench built with [Bubbletea](https://github
 - **Agent List** — all agents with status icons: `●` active, `◌` idle, `✓` completed, `⏸` paused, `✗` failed
 
 ### Center Column
-- **Conversation** — full-height scrollable chat display. Messages are color-coded by role (user, assistant, system). Text input at the bottom, Claude CLI style.
+- **Conversation** — full-height scrollable chat display. Messages are color-coded by role (user, assistant, tool/system). The rail-styled input box stays active for chat unless a menu or settings panel is open.
 
 ### Right Column
 - **Agent Detail** — name, status, token usage, task description, fingerprint profile, assigned proxy
@@ -47,21 +47,27 @@ CREATE ──→ ACTIVE ──→ PAUSED ──→ ACTIVE ──→ COMPLETED
 
 Agents are **persistent** — their conversations are stored in the SQLite vault and survive restarts. Each agent gets a deterministic fingerprint generated from a seed, so resuming an agent maintains the same browser identity.
 
-## Key Bindings
+## Workbench Controls
 
-| Key | Action |
-|-----|--------|
-| `n` | Create new agent (prompts for name, then task) |
-| `j` / `k` | Navigate agent list up/down |
-| `Enter` | Send message to selected agent |
-| `p` | Pause selected agent (`/savestate` sent to OpenClaw) |
-| `r` | Resume paused agent with saved session |
-| `x` | Delete agent and its conversation history |
-| `Tab` | Cycle focus: Agent List → Conversation → Agent Detail → Contexts |
-| `Esc` | Cancel current input / go back |
-| `Shift+S` | Open settings panel (replaces center column) |
-| `c` | Re-open setup wizard to change provider/model |
-| `q` | Quit VulpineOS |
+The main workbench is command-first instead of shortcut-first:
+
+| Control | Action |
+|---------|--------|
+| Chat text + `Enter` | Send a message to the selected agent |
+| `/` | Open the command palette |
+| `↑` / `↓` | Move through command options |
+| `Enter` in the palette | Select a command |
+| `Esc` | Close the palette, cancel a menu, or clear text selection |
+| Mouse click on an agent row | Switch to that agent |
+| Mouse wheel over chat | Scroll the conversation |
+| Mouse wheel over agent list | Scroll/select agents |
+| `Cmd+C` on macOS | Copy selected chat text |
+| `Ctrl+C` | Emergency quit confirmation |
+
+Use slash commands for workbench actions such as `/new`, `/agents`, `/view`,
+`/hide`, `/log`, `/trace`, `/copy`, `/settings`, `/config`, and `/quit`.
+Direct action shortcuts such as `n`, `q`, `o`, `v`, `t`, `x`, and `j/k` are
+intentionally removed from the main workbench.
 
 ## Settings Panel
 
@@ -69,7 +75,10 @@ Press `Shift+S` to open the 3-tab settings panel:
 
 1. **General** — AI provider, model, API key
 2. **Proxies** — import proxy URLs, test latency, resolve geo, delete
-3. **Skills** — toggle global OpenClaw skills on/off
+3. **Skills** — toggle global and agent skills on/off
+
+The settings panel remains keyboard-driven and shows its own shortcuts inside
+the panel.
 
 ## Theme
 

@@ -1,81 +1,63 @@
 ---
 title: "Source Availability"
-description: "Which VulpineOS products are open source, which are source-closed, and how commercial features connect to public interfaces."
+description: "Which VulpineOS components are open source and how optional provider interfaces connect to public builds."
 ---
 
 # Source Availability
 
-VulpineOS uses a mixed-source model. Product names and high-level capabilities are public; implementation source is open only where the product is intended to be open infrastructure.
+VulpineOS keeps the public repository focused on the open runtime: browser
+orchestration, operator interfaces, MCP tools, and stable extension interfaces.
+Optional providers can attach behind those interfaces without changing the
+public tool contract.
 
 ## Open Source
 
-| Product | Repository | What Is Public |
-|---------|------------|----------------|
+| Component | Repository | What Is Public |
+|-----------|------------|----------------|
 | VulpineOS | `VulpineOS/VulpineOS` | Browser runtime, MCP server, web panel, TUI, Juggler bindings, no-op extension interfaces |
 | Vulpine Mark | `VulpineOS/vulpine-mark` | Set-of-Mark screenshots, visual element labels, JSON/SVG output, click/type/hover by label |
 | MobileBridge for Android | `VulpineOS/mobilebridge` | Android ADB/CDP bridge, device listing, gestures, attached server, reconnect handling |
-| Foxbridge | `VulpineOS/foxbridge` | CDP-to-Firefox proxy, protocol forwarding, OpenClaw/Puppeteer compatibility |
-| Docs | `VulpineOS/vulpineos-docs` | Product docs, setup guides, public API positioning, open-source project documentation |
+| Foxbridge | `VulpineOS/foxbridge` | CDP-to-Firefox proxy and protocol forwarding for compatible clients |
+| Docs | `VulpineOS/vulpineos-docs` | Product docs, setup guides, and public project documentation |
 
-These repositories can describe commercial products by name, but should contain only public interfaces, no-op stubs, docs, and open-source implementation code.
+## Extension Boundary
 
-## Source-Closed
+Public VulpineOS builds expose stable extension interfaces. If no provider is
+registered, the corresponding tool returns a clear unavailable response instead
+of pretending a feature exists.
 
-| Product | What It Provides |
-|---------|------------------|
-| Vulpine API | Hosted extraction API, authenticated and visual workflows, browser audio and mobile endpoints, recurring monitors, billing, API keys, and dashboard backend |
-| Vulpine Vault | Credential references, secure autofill, TOTP, authenticated workflows, provider imports |
-| AudioBridge | Browser audio capture sessions, audio chunk streaming, transcription-oriented workflows |
-| MobileBridge for iOS | iOS device support and Web Inspector bridge integration |
-| Vulpine Sentinel | Stealth health monitoring and fleet risk scoring |
-| Vulpine Replay | Deterministic debugging and audit replay workflows |
-| Vulpine Clockwork | Mid-session identity rotation for long-running browser sessions |
+| Capability | Public Surface |
+|------------|----------------|
+| Credential workflows | `vulpine_get_credential`, `vulpine_autofill` |
+| Audio workflows | `vulpine_start_audio_capture`, `vulpine_stop_audio_capture`, `vulpine_read_audio_chunk` |
+| Mobile workflows | `vulpine_list_mobile_devices`, `vulpine_connect_mobile_device`, `vulpine_disconnect_mobile_device` |
+| Visual workflows | `vulpine_annotated_screenshot`, `vulpine_click_label` |
 
-Closed products may be listed in public docs and API materials. Their source code, private build wiring, browser patches, operational details, and private plan docs stay outside public repositories.
+The public repository includes the interfaces, no-op fallbacks, operator status
+surfaces, and tests for graceful degradation. Provider implementations, private
+deployment wiring, and unreleased product details do not belong in public repos.
 
 ## Browser Patch Boundary
 
-A paid build may include source-closed browser-engine patches. The boundary is:
+The public source includes the browser patches needed for the released open
+runtime. Sensitive private experiments, detector notes, internal plan docs, and
+unreleased browser research should stay out of public history.
 
 | Allowed Publicly | Kept Private |
 |------------------|--------------|
-| Product name and user-facing capability | Patch source code for closed capabilities |
-| Stable public protocol/tool names | Private patch files and build scripts |
-| No-op public interfaces | Real closed-provider implementations |
-| High-level API behavior | Internal capture, credential, iOS, or paid-service logic |
+| Stable public protocol/tool names | Private provider implementations |
+| No-op extension interfaces | Private build wiring and credentials |
+| High-level user-facing behavior | Detector notes and unreleased research |
+| Public release artifacts and checksums | Internal plan docs and operational detail |
 
-Publishing a binary does not publish source code by itself. Source becomes accessible only if the patch files, implementation code, symbols with sensitive detail, debug artifacts, or source bundles are shipped or committed publicly.
-
-## Integration Pattern
-
-Public VulpineOS builds expose stable extension interfaces. Without a provider attached, commercial extension tools return clear unavailable errors. Paid/private builds attach real providers behind the same public tool names, so client code does not need to change.
-
-| Capability | Public Surface | Source-Closed Provider |
-|------------|----------------|------------------------|
-| Credential workflows | `vulpine_get_credential`, `vulpine_autofill` | Vulpine Vault |
-| Audio workflows | `vulpine_start_audio_capture`, `vulpine_stop_audio_capture`, `vulpine_read_audio_chunk` | AudioBridge |
-| Mobile workflows | `vulpine_list_mobile_devices`, `vulpine_connect_mobile_device`, `vulpine_disconnect_mobile_device` | Android open source, iOS source-closed |
-| Visual workflows | `vulpine_annotated_screenshot`, `vulpine_click_label` | VulpineOS and Vulpine Mark, with paid hosted endpoints in Vulpine API |
-
-## Planned Commercial Products
-
-The following names are public roadmap language. They remain source-closed unless explicitly reclassified later:
-
-- Vulpine Sentinel
-- Vulpine Replay
-- Vulpine Clockwork
-- Vulpine Prism
-- Vulpine Pulse
-- Vulpine Forge
-- Vulpine Scribe
-- Vulpine Harbor
-- Vulpine Mesh
-- Vulpine Oracle
+Publishing a binary does not publish source code by itself. Source becomes
+public only when implementation code, patches, symbols with sensitive detail,
+debug artifacts, or source bundles are committed or shipped.
 
 ---
 
 ## See also
 
-- [Vulpine API Features](/api-features) — hosted API and commercial feature surface
 - [MCP Browser Tools](/mcp-tools) — stable public tool names
 - [Contributing](/contributing) — public repository workflow
+- [Launch Checklist](/launch-checklist) — public release checks

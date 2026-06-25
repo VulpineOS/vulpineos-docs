@@ -11,28 +11,17 @@ A browser-based management interface embedded in the VulpineOS binary for monito
 
 ## Starting the Web Panel
 
-Local panel mode:
-
-```bash
-./vulpineos panel
-```
-
-`vulpineos panel` binds to `127.0.0.1`, prints a direct panel URL, and opens it
-in the browser when possible. If `--api-key` is omitted, VulpineOS generates a
-session access key and includes it in the URL so the panel can log in directly.
-After load, the panel bootstraps that key into session-scoped browser storage
-and removes it from the visible address bar.
-
-Networked serve mode:
+Start the served control plane:
 
 ```bash
 ./vulpineos serve --host 0.0.0.0 --port 8443 --no-tls --api-key $VULPINE_API_KEY
 ```
 
 If `--api-key` is omitted in serve mode, VulpineOS generates one at startup and
-prints both the access key and a direct panel URL containing the token.
+prints both the access key and a direct panel URL. Open that URL in a browser to
+use the web panel.
 
-Open a remote panel from another machine:
+Connect the remote TUI from another machine:
 
 ```bash
 ./vulpineos remote --url http://your-server:8443 --api-key $VULPINE_API_KEY
@@ -66,7 +55,7 @@ Five operator views:
 
 - **Conversation** — Full message history with role-colored entries (user/assistant). Send messages to the agent via text input.
 - **Trace** — Tool calls, result summaries, and detected failed-action warnings.
-- **Raw** — Live OpenClaw session log stream with exact JSONL records.
+- **Raw** — Live agent session log stream with exact JSONL records.
 - **Recording** — Action timeline showing timestamped browser actions (navigate, click, type, scroll, screenshot), with JSON export.
 - **Fingerprint** — JSON view of the agent's assigned fingerprint (user agent, screen dimensions, WebGL, etc), with regenerate-and-apply controls.
 
@@ -102,12 +91,12 @@ step-by-step execution results plus captured variables.
 
 Two operator views live here:
 
-- **Runtime Audit** — persisted kernel, foxbridge, and OpenClaw lifecycle events so restart and crash history survives reconnects and process restarts.
+- **Runtime Audit** — persisted kernel, foxbridge, and agent-runtime lifecycle events so restart and crash history survives reconnects and process restarts.
 - **Event Stream** — live filterable WebSocket event feed with timestamp, method, and params.
 
 ### Login
 
-Access-key login screen for remote panel access. The panel stores only the key
+Access-key login screen for served panel access. The panel stores only the key
 needed to authenticate its WebSocket session. If you open the panel through a
 printed tokenized URL, the key is bootstrapped automatically and removed from
 the visible address bar after load. Manual login validates the key through
@@ -119,28 +108,19 @@ Configure LLM provider, model, and API key (persisted to `~/.vulpineos/config.js
 
 ## API Communication
 
-The panel communicates via WebSocket control messages to the `PanelAPI`
+The panel communicates via WebSocket control messages to the `ControlAPI`
 handler. All messages go through the `/ws` endpoint with access-key
 authentication.
 
-46 control message types across 14 domains, verified against `internal/remote/api.go`:
+19 control message types across 5 domains, verified against `internal/remote/control.go`:
 
-| Domain       | Messages                                                                                      |
-| ------------ | --------------------------------------------------------------------------------------------- |
-| agents       | list, spawn, kill, pause, pauseMany, resume, resumeMany, killMany, getMessages, getSessionLog |
-| config       | get, providers, set                                                                           |
-| costs        | getAll, setBudget, total                                                                      |
-| webhooks     | list, add, remove                                                                             |
-| proxies      | list, add, delete, test, getRotation, setRotation                                             |
-| bus          | pending, approve, reject, policies, addPolicy, removePolicy                                   |
-| recording    | getTimeline, export                                                                           |
-| fingerprints | get, generate                                                                                 |
-| scripts      | run                                                                                           |
-| security     | status                                                                                        |
-| status       | get                                                                                           |
-| sentinel     | get, timeline                                                                                 |
-| runtime      | list, export, setRetention                                                                    |
-| contexts     | list, create, remove                                                                          |
+| Domain   | Messages                                                                                      |
+| -------- | --------------------------------------------------------------------------------------------- |
+| agents   | list, create, spawn, kill, pause, pauseMany, resume, resumeMany, killMany, getMessages, getSessionLog |
+| config   | providers, set                                                                                |
+| proxies  | add, delete, test                                                                             |
+| settings | get, skills.set                                                                               |
+| status   | get                                                                                           |
 
 Example message flow:
 
@@ -179,9 +159,8 @@ active agent count stay visible while moving between pages.
 ### Single Binary
 
 The web panel's static assets (HTML, CSS, JS) are embedded in the Go binary
-using `//go:embed`. No external web server is needed — `vulpineos panel` and
-`vulpineos serve` both start the kernel, foxbridge CDP proxy, and web panel
-from a single binary.
+using `//go:embed`. No external web server is needed — `vulpineos serve` starts
+the kernel, foxbridge CDP proxy, and web panel from a single binary.
 
 ---
 
