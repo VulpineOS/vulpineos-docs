@@ -49,7 +49,7 @@ vulpineos remote --url http://host:8443 --api-key KEY
 vulpineos mcp
 ```
 
-Removed compatibility commands such as `vulpineos panel`, `vulpineos tui`, `vulpineos remote panel`, and `vulpineos remote tui` should not be used.
+Older compatibility subcommands have been removed. Use only the commands listed above.
 
 ## Common Questions
 

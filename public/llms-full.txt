@@ -41,7 +41,7 @@ vulpineos remote --url http://host:8443 --api-key KEY
 vulpineos mcp
 ```
 
-`vulpineos panel`, `vulpineos tui`, `vulpineos remote panel`, and `vulpineos remote tui` are removed compatibility commands. Use `vulpineos` for the local TUI, `vulpineos serve` for the web panel/control plane, and `vulpineos remote --url ...` for the remote TUI.
+Older compatibility subcommands have been removed. Use `vulpineos` for the local TUI, `vulpineos serve` for the web panel/control plane, and `vulpineos remote --url ...` for the remote TUI.
 
 ## Core Security Features
 
